@@ -6,6 +6,13 @@ import (
 	"github.com/bianoble/agent-sync/internal/target"
 )
 
+// ConfigLayerStatus describes a config layer's load status for display.
+type ConfigLayerStatus struct {
+	Level  string // "system", "user", "project"
+	Path   string
+	Loaded bool
+}
+
 // InfoResult holds tool information for the info command.
 type InfoResult struct {
 	Version     string
@@ -13,6 +20,7 @@ type InfoResult struct {
 	LockPath    string
 	CacheDir    string
 	Tools       []ToolInfo
+	ConfigChain []ConfigLayerStatus
 	CacheSize   int64
 	SpecVersion int
 }

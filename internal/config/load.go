@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -9,6 +10,8 @@ import (
 )
 
 // Load reads and validates an agent-sync.yaml configuration file.
+// This loads a single file with full validation — use LoadHierarchical
+// for system/user/project merging.
 func Load(path string) (*Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -25,6 +28,118 @@ func Load(path string) (*Config, error) {
 	}
 
 	return &cfg, nil
+}
+
+// Parse reads a config file without validation.
+// Used for loading system/user layers that may be incomplete on their own.
+func Parse(path string) (*Config, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("reading config %s: %w", path, err)
+	}
+
+	var cfg Config
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		return nil, fmt.Errorf("parsing config %s: %w", path, err)
+	}
+
+	return &cfg, nil
+}
+
+// HierarchicalOptions configures hierarchical config loading.
+type HierarchicalOptions struct {
+	// ProjectPath is the project-level config path (required).
+	ProjectPath string
+
+	// SystemConfigPath overrides the system config location.
+	// Empty uses OS default.
+	SystemConfigPath string
+
+	// UserConfigPath overrides the user config location.
+	// Empty uses OS default.
+	UserConfigPath string
+
+	// NoInherit disables hierarchy; loads only ProjectPath.
+	NoInherit bool
+}
+
+// HierarchicalResult holds the merged config and metadata about which layers were loaded.
+type HierarchicalResult struct {
+	Config *Config
+	Layers []ConfigLayerInfo
+}
+
+// LoadHierarchical discovers, loads, merges, and validates configs
+// from system, user, and project levels.
+//
+// Missing system/user configs are silently skipped. A missing project
+// config is a fatal error. Existing files with parse errors are fatal.
+// Version mismatches across layers are fatal.
+func LoadHierarchical(opts HierarchicalOptions) (*HierarchicalResult, error) {
+	if opts.NoInherit {
+		cfg, err := Load(opts.ProjectPath)
+		if err != nil {
+			return nil, err
+		}
+		return &HierarchicalResult{
+			Config: cfg,
+			Layers: []ConfigLayerInfo{
+				{Path: opts.ProjectPath, Level: LevelProject, Loaded: true},
+			},
+		}, nil
+	}
+
+	layers := DiscoverPaths(DiscoverOptions{
+		ProjectPath:      opts.ProjectPath,
+		SystemConfigPath: opts.SystemConfigPath,
+		UserConfigPath:   opts.UserConfigPath,
+	})
+
+	var configs []*Config
+	for i := range layers {
+		layer := &layers[i]
+
+		cfg, err := Parse(layer.Path)
+		if err != nil {
+			if errors.Is(err, os.ErrNotExist) && layer.Level != LevelProject {
+				// Missing system/user config is fine; skip silently.
+				continue
+			}
+			if errors.Is(err, os.ErrPermission) {
+				layer.Err = fmt.Errorf("%s config %s: permission denied", layer.Level, layer.Path)
+				return nil, layer.Err
+			}
+			if layer.Level == LevelProject {
+				return nil, fmt.Errorf("loading project config %s: %w", layer.Path, err)
+			}
+			// Existing file with parse error is fatal.
+			layer.Err = fmt.Errorf("parsing %s config %s: %w", layer.Level, layer.Path, err)
+			return nil, layer.Err
+		}
+
+		layer.Loaded = true
+		configs = append(configs, cfg)
+	}
+
+	if len(configs) == 0 {
+		return nil, fmt.Errorf("no config files found (project config %s is required)", opts.ProjectPath)
+	}
+
+	// Merge all loaded configs (lowest precedence first).
+	merged, err := MergeAll(configs)
+	if err != nil {
+		return nil, err
+	}
+
+	// Validate the merged result.
+	if errs := Validate(merged); len(errs) > 0 {
+		return nil, &ValidationError{Errors: errs}
+	}
+
+	return &HierarchicalResult{
+		Config: merged,
+		Layers: layers,
+	}, nil
 }
 
 // ValidationError holds multiple validation failures.

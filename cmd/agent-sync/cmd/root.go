@@ -21,6 +21,7 @@ var (
 	verbose      bool
 	quiet        bool
 	noColor      bool
+	noInherit    bool
 )
 
 var rootCmd = &cobra.Command{
@@ -51,6 +52,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "detailed output")
 	rootCmd.PersistentFlags().BoolVar(&quiet, "quiet", false, "minimal output (errors only)")
 	rootCmd.PersistentFlags().BoolVar(&noColor, "no-color", false, "disable colored output")
+	rootCmd.PersistentFlags().BoolVar(&noInherit, "no-inherit", false, "disable hierarchical config resolution; use only the project config")
 
 	rootCmd.AddCommand(versionCmd)
 }

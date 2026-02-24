@@ -12,13 +12,53 @@ import (
 	"github.com/bianoble/agent-sync/internal/target"
 )
 
-// loadConfig reads and validates the config file.
+// loadConfig reads and validates the config file using hierarchical resolution.
+// System and user configs are merged below the project config unless --no-inherit
+// is set or AGENT_SYNC_NO_INHERIT is enabled.
 func loadConfig() (*config.Config, error) {
-	cfg, err := config.Load(configPath)
+	result, err := loadConfigHierarchical()
 	if err != nil {
-		return nil, fmt.Errorf("loading config %s: %w", configPath, err)
+		return nil, err
 	}
-	return cfg, nil
+	return result.Config, nil
+}
+
+// loadConfigHierarchical returns both the merged config and layer metadata.
+func loadConfigHierarchical() (*config.HierarchicalResult, error) {
+	inherit := !noInherit && !config.EnvNoInherit()
+
+	opts := config.HierarchicalOptions{
+		ProjectPath:      configPath,
+		SystemConfigPath: os.Getenv("AGENT_SYNC_SYSTEM_CONFIG"),
+		UserConfigPath:   os.Getenv("AGENT_SYNC_USER_CONFIG"),
+		NoInherit:        !inherit,
+	}
+
+	result, err := config.LoadHierarchical(opts)
+	if err != nil {
+		return nil, fmt.Errorf("loading config: %w", err)
+	}
+
+	if verbose && inherit {
+		for _, l := range result.Layers {
+			if l.Loaded {
+				detail("config: loaded %s %s", l.Level, l.Path)
+			} else if l.Err == nil {
+				detail("config: %s %s (not found, skipping)", l.Level, l.Path)
+			}
+		}
+		loaded := 0
+		for _, l := range result.Layers {
+			if l.Loaded {
+				loaded++
+			}
+		}
+		if loaded > 1 {
+			detail("config: merged %d layers", loaded)
+		}
+	}
+
+	return result, nil
 }
 
 // loadLockfile reads the lockfile if it exists. Returns an empty lockfile if missing.

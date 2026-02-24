@@ -39,6 +39,7 @@ nav:
       - Tool Map: guides/toolmap.md
       - Transforms: guides/transforms.md
       - Security Model: guides/security.md
+      - Enterprise & DevSecOps: guides/enterprise-config.md
   - Go Library: reference/library.md
   - Specification: spec.md
 

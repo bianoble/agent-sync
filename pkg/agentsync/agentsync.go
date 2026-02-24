@@ -112,16 +112,31 @@ type Options struct {
 
 	// CacheDir is the cache directory. If empty, uses the default (~/.cache/agent-sync).
 	CacheDir string
+
+	// SystemConfigPath overrides the system-level config path.
+	// Empty uses the OS default (/etc/agent-sync/ on Unix, %ProgramData% on Windows).
+	SystemConfigPath string
+
+	// UserConfigPath overrides the user-level config path.
+	// Empty uses the OS default (os.UserConfigDir()/agent-sync/).
+	UserConfigPath string
+
+	// NoInherit disables hierarchical config resolution.
+	// When true, only ConfigPath is loaded (no system/user merging).
+	NoInherit bool
 }
 
 // Client is the main entry point for the agent-sync library.
 // It implements Syncer, Checker, Verifier, Pruner, and Updater.
 type Client struct {
-	registry     *source.Registry
-	cache        *cache.Cache
-	projectRoot  string
-	configPath   string
-	lockfilePath string
+	registry         *source.Registry
+	cache            *cache.Cache
+	projectRoot      string
+	configPath       string
+	lockfilePath     string
+	systemConfigPath string
+	userConfigPath   string
+	noInherit        bool
 }
 
 // New creates a new agent-sync Client.
@@ -157,16 +172,28 @@ func New(opts Options) (*Client, error) {
 	reg.Register("local", &source.LocalResolver{})
 
 	return &Client{
-		projectRoot:  root,
-		configPath:   opts.ConfigPath,
-		lockfilePath: opts.LockfilePath,
-		registry:     reg,
-		cache:        c,
+		projectRoot:      root,
+		configPath:       opts.ConfigPath,
+		lockfilePath:     opts.LockfilePath,
+		systemConfigPath: opts.SystemConfigPath,
+		userConfigPath:   opts.UserConfigPath,
+		noInherit:        opts.NoInherit,
+		registry:         reg,
+		cache:            c,
 	}, nil
 }
 
 func (c *Client) loadConfig() (*config.Config, error) {
-	return config.Load(c.configPath)
+	result, err := config.LoadHierarchical(config.HierarchicalOptions{
+		ProjectPath:      c.configPath,
+		SystemConfigPath: c.systemConfigPath,
+		UserConfigPath:   c.userConfigPath,
+		NoInherit:        c.noInherit,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.Config, nil
 }
 
 func (c *Client) loadLockfile() (*lock.Lockfile, error) {
