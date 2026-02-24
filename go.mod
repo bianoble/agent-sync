@@ -1,6 +1,6 @@
 module github.com/bianoble/agent-sync
 
-go 1.25.0
+go 1.24
 
 require (
 	github.com/spf13/cobra v1.10.2
