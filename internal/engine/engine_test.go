@@ -11,7 +11,6 @@ import (
 	"github.com/bianoble/agent-sync/internal/lock"
 	"github.com/bianoble/agent-sync/internal/source"
 	"github.com/bianoble/agent-sync/internal/target"
-	"github.com/bianoble/agent-sync/pkg/agentsync"
 )
 
 // mockResolver is a test resolver that returns predefined content.
@@ -587,4 +586,4 @@ func TestPruneEngineDryRun(t *testing.T) {
 }
 
 // Ensure unused import is consumed.
-var _ = agentsync.SyncResult{}
+var _ = SyncResult{}

@@ -7,7 +7,6 @@ import (
 	"github.com/bianoble/agent-sync/internal/config"
 	"github.com/bianoble/agent-sync/internal/lock"
 	"github.com/bianoble/agent-sync/internal/source"
-	"github.com/bianoble/agent-sync/pkg/agentsync"
 )
 
 // VerifyEngine checks whether upstream sources have changed since the lockfile was written.
@@ -17,8 +16,8 @@ type VerifyEngine struct {
 }
 
 // Verify checks upstream sources against lockfile state.
-func (e *VerifyEngine) Verify(ctx context.Context, lf lock.Lockfile, cfg config.Config, sourceNames []string) (*agentsync.VerifyResult, error) {
-	result := &agentsync.VerifyResult{}
+func (e *VerifyEngine) Verify(ctx context.Context, lf lock.Lockfile, cfg config.Config, sourceNames []string) (*VerifyResult, error) {
+	result := &VerifyResult{}
 
 	// Build lookup.
 	lockedByName := make(map[string]lock.LockedSource)
@@ -42,7 +41,7 @@ func (e *VerifyEngine) Verify(ctx context.Context, lf lock.Lockfile, cfg config.
 	for _, name := range names {
 		src, ok := configByName[name]
 		if !ok {
-			result.Errors = append(result.Errors, agentsync.SourceError{
+			result.Errors = append(result.Errors, SourceError{
 				Source: name,
 				Err:    fmt.Errorf("source '%s' not found in config", name),
 			})
@@ -51,7 +50,7 @@ func (e *VerifyEngine) Verify(ctx context.Context, lf lock.Lockfile, cfg config.
 
 		ls, ok := lockedByName[name]
 		if !ok {
-			result.Changed = append(result.Changed, agentsync.SourceDelta{
+			result.Changed = append(result.Changed, SourceDelta{
 				Source: name,
 				Before: "(not locked)",
 				After:  "(needs update)",
@@ -61,18 +60,18 @@ func (e *VerifyEngine) Verify(ctx context.Context, lf lock.Lockfile, cfg config.
 
 		resolver, err := e.Registry.Get(src.Type)
 		if err != nil {
-			result.Errors = append(result.Errors, agentsync.SourceError{Source: name, Err: err})
+			result.Errors = append(result.Errors, SourceError{Source: name, Err: err})
 			continue
 		}
 
 		resolved, err := resolver.Resolve(ctx, src, e.ProjectRoot)
 		if err != nil {
-			result.Errors = append(result.Errors, agentsync.SourceError{Source: name, Err: err})
+			result.Errors = append(result.Errors, SourceError{Source: name, Err: err})
 			continue
 		}
 
 		if hasChanged(ls, resolved) {
-			result.Changed = append(result.Changed, agentsync.SourceDelta{
+			result.Changed = append(result.Changed, SourceDelta{
 				Source: name,
 				Before: summarizeLocked(ls),
 				After:  summarizeResolved(resolved),

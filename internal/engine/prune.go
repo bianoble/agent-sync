@@ -9,7 +9,6 @@ import (
 	"github.com/bianoble/agent-sync/internal/lock"
 	"github.com/bianoble/agent-sync/internal/sandbox"
 	"github.com/bianoble/agent-sync/internal/target"
-	"github.com/bianoble/agent-sync/pkg/agentsync"
 )
 
 // PruneEngine removes files that are no longer referenced in the configuration.
@@ -24,8 +23,8 @@ type PruneOptions struct {
 }
 
 // Prune removes previously synced files that are no longer in the config.
-func (e *PruneEngine) Prune(ctx context.Context, lf lock.Lockfile, cfg config.Config, opts PruneOptions) (*agentsync.PruneResult, error) {
-	result := &agentsync.PruneResult{}
+func (e *PruneEngine) Prune(ctx context.Context, lf lock.Lockfile, cfg config.Config, opts PruneOptions) (*PruneResult, error) {
+	result := &PruneResult{}
 
 	// Resolve current config targets to get the set of expected files.
 	currentTargets, err := resolveAllTargets(e.ToolMap, cfg)
@@ -115,7 +114,7 @@ func (e *PruneEngine) Prune(ctx context.Context, lf lock.Lockfile, cfg config.Co
 			for relPath := range ls.Resolved.Files {
 				destPath := filepath.Join(dest, relPath)
 				if err := sandbox.SafeRemove(e.ProjectRoot, destPath); err == nil {
-					result.Removed = append(result.Removed, agentsync.FileAction{
+					result.Removed = append(result.Removed, FileAction{
 						Path:   destPath,
 						Action: "removed",
 					})

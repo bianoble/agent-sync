@@ -8,7 +8,6 @@ import (
 	"github.com/bianoble/agent-sync/internal/config"
 	"github.com/bianoble/agent-sync/internal/lock"
 	"github.com/bianoble/agent-sync/internal/source"
-	"github.com/bianoble/agent-sync/pkg/agentsync"
 )
 
 // UpdateEngine resolves sources against their upstream and updates the lockfile.
@@ -35,7 +34,7 @@ type SourceUpdate struct {
 // UpdateResult holds the outcome of an update operation.
 type UpdateResult struct {
 	Updated  []SourceUpdate
-	Failed   []agentsync.SourceError
+	Failed   []SourceError
 	Lockfile *lock.Lockfile // nil if dry-run
 }
 
@@ -54,7 +53,7 @@ func (e *UpdateEngine) Update(ctx context.Context, cfg config.Config, currentLoc
 		for _, name := range opts.SourceNames {
 			s, ok := configByName[name]
 			if !ok {
-				result.Failed = append(result.Failed, agentsync.SourceError{
+				result.Failed = append(result.Failed, SourceError{
 					Source: name,
 					Err:    fmt.Errorf("source '%s' not found in config", name),
 				})
@@ -78,13 +77,13 @@ func (e *UpdateEngine) Update(ctx context.Context, cfg config.Config, currentLoc
 	for _, src := range sourcesToUpdate {
 		resolver, err := e.Registry.Get(src.Type)
 		if err != nil {
-			result.Failed = append(result.Failed, agentsync.SourceError{Source: src.Name, Err: err})
+			result.Failed = append(result.Failed, SourceError{Source: src.Name, Err: err})
 			continue
 		}
 
 		resolved, err := resolver.Resolve(ctx, src, e.ProjectRoot)
 		if err != nil {
-			result.Failed = append(result.Failed, agentsync.SourceError{Source: src.Name, Err: err})
+			result.Failed = append(result.Failed, SourceError{Source: src.Name, Err: err})
 			continue
 		}
 

@@ -10,7 +10,6 @@ import (
 	"github.com/bianoble/agent-sync/internal/config"
 	"github.com/bianoble/agent-sync/internal/lock"
 	"github.com/bianoble/agent-sync/internal/target"
-	"github.com/bianoble/agent-sync/pkg/agentsync"
 )
 
 // CheckEngine verifies that target files match the lockfile.
@@ -21,8 +20,8 @@ type CheckEngine struct {
 
 // Check verifies target files against the lockfile.
 // Returns Clean=true if everything matches.
-func (e *CheckEngine) Check(ctx context.Context, lf lock.Lockfile, cfg config.Config) (*agentsync.CheckResult, error) {
-	result := &agentsync.CheckResult{Clean: true}
+func (e *CheckEngine) Check(ctx context.Context, lf lock.Lockfile, cfg config.Config) (*CheckResult, error) {
+	result := &CheckResult{Clean: true}
 
 	// Resolve all targets.
 	targetMap, err := resolveAllTargets(e.ToolMap, cfg)
@@ -59,7 +58,7 @@ func (e *CheckEngine) Check(ctx context.Context, lf lock.Lockfile, cfg config.Co
 
 				actualHash := sha256Hex(content)
 				if actualHash != fh.SHA256 {
-					result.Drifted = append(result.Drifted, agentsync.DriftEntry{
+					result.Drifted = append(result.Drifted, DriftEntry{
 						Path:     destPath,
 						Expected: fh.SHA256,
 						Actual:   actualHash,

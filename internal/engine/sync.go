@@ -16,7 +16,6 @@ import (
 	"github.com/bianoble/agent-sync/internal/source"
 	"github.com/bianoble/agent-sync/internal/target"
 	"github.com/bianoble/agent-sync/internal/transform"
-	"github.com/bianoble/agent-sync/pkg/agentsync"
 )
 
 // SyncEngine orchestrates the sync operation.
@@ -34,8 +33,8 @@ type SyncOptions struct {
 
 // Sync synchronizes files to targets using the lockfile as the source of truth.
 // It does NOT modify the lockfile.
-func (e *SyncEngine) Sync(ctx context.Context, lf lock.Lockfile, cfg config.Config, opts SyncOptions) (*agentsync.SyncResult, error) {
-	result := &agentsync.SyncResult{}
+func (e *SyncEngine) Sync(ctx context.Context, lf lock.Lockfile, cfg config.Config, opts SyncOptions) (*SyncResult, error) {
+	result := &SyncResult{}
 
 	// Resolve all targets.
 	targetMap, err := resolveAllTargets(e.ToolMap, cfg)
@@ -77,7 +76,7 @@ func (e *SyncEngine) Sync(ctx context.Context, lf lock.Lockfile, cfg config.Conf
 		// Fetch content for this source.
 		files, fetchErr := e.fetchSourceFiles(ctx, ls, cfg)
 		if fetchErr != nil {
-			result.Errors = append(result.Errors, agentsync.SourceError{Source: ls.Name, Err: fetchErr})
+			result.Errors = append(result.Errors, SourceError{Source: ls.Name, Err: fetchErr})
 			continue
 		}
 
@@ -85,7 +84,7 @@ func (e *SyncEngine) Sync(ctx context.Context, lf lock.Lockfile, cfg config.Conf
 		if transforms, hasTx := transformsBySource[ls.Name]; hasTx {
 			files, fetchErr = applyTransforms(files, transforms, cfg.Variables)
 			if fetchErr != nil {
-				result.Errors = append(result.Errors, agentsync.SourceError{Source: ls.Name, Err: fetchErr})
+				result.Errors = append(result.Errors, SourceError{Source: ls.Name, Err: fetchErr})
 				continue
 			}
 		}
@@ -130,11 +129,11 @@ func (e *SyncEngine) Sync(ctx context.Context, lf lock.Lockfile, cfg config.Conf
 			absPath := filepath.Join(e.ProjectRoot, op.destPath)
 			existing, err := os.ReadFile(absPath)
 			if err != nil {
-				result.Written = append(result.Written, agentsync.FileAction{Path: op.destPath, Action: "new"})
+				result.Written = append(result.Written, FileAction{Path: op.destPath, Action: "new"})
 			} else if hex.EncodeToString(sha256Hash(existing)) != hex.EncodeToString(sha256Hash(op.content)) {
-				result.Written = append(result.Written, agentsync.FileAction{Path: op.destPath, Action: "modified"})
+				result.Written = append(result.Written, FileAction{Path: op.destPath, Action: "modified"})
 			} else {
-				result.Skipped = append(result.Skipped, agentsync.FileAction{Path: op.destPath, Action: "unchanged"})
+				result.Skipped = append(result.Skipped, FileAction{Path: op.destPath, Action: "unchanged"})
 			}
 		}
 		return result, nil
@@ -156,14 +155,14 @@ func (e *SyncEngine) Sync(ctx context.Context, lf lock.Lockfile, cfg config.Conf
 		absPath := filepath.Join(e.ProjectRoot, op.destPath)
 		existing, readErr := os.ReadFile(absPath)
 		if readErr == nil && hex.EncodeToString(sha256Hash(existing)) == hex.EncodeToString(sha256Hash(op.content)) {
-			result.Skipped = append(result.Skipped, agentsync.FileAction{Path: op.destPath, Action: "unchanged"})
+			result.Skipped = append(result.Skipped, FileAction{Path: op.destPath, Action: "unchanged"})
 			continue
 		}
 
 		if err := sandbox.SafeWrite(e.ProjectRoot, op.destPath, op.content, 0644); err != nil {
 			// Rollback.
 			rollback(e.ProjectRoot, writtenPaths, snapshots)
-			result.Errors = append(result.Errors, agentsync.SourceError{Source: op.source, Err: fmt.Errorf("writing %s: %w", op.destPath, err)})
+			result.Errors = append(result.Errors, SourceError{Source: op.source, Err: fmt.Errorf("writing %s: %w", op.destPath, err)})
 			return result, fmt.Errorf("sync failed, rolled back: %w", err)
 		}
 
@@ -172,7 +171,7 @@ func (e *SyncEngine) Sync(ctx context.Context, lf lock.Lockfile, cfg config.Conf
 			action = "modified"
 		}
 		writtenPaths = append(writtenPaths, op.destPath)
-		result.Written = append(result.Written, agentsync.FileAction{Path: op.destPath, Action: action})
+		result.Written = append(result.Written, FileAction{Path: op.destPath, Action: action})
 	}
 
 	return result, nil
