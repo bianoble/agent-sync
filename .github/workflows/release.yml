@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache: true
+
+      - name: Run tests
+        run: go test -race ./...
+
+      - name: Build binaries
+        run: |
+          VERSION=${GITHUB_REF_NAME}
+          COMMIT=$(git rev-parse --short HEAD)
+          DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          LDFLAGS="-s -w -X github.com/bianoble/agent-sync/cmd/agent-sync/cmd.version=${VERSION} -X github.com/bianoble/agent-sync/cmd/agent-sync/cmd.commit=${COMMIT} -X github.com/bianoble/agent-sync/cmd/agent-sync/cmd.date=${DATE}"
+
+          mkdir -p dist
+
+          # Linux amd64
+          GOOS=linux GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/agent-sync-linux-amd64 ./cmd/agent-sync
+          # Linux arm64
+          GOOS=linux GOARCH=arm64 go build -ldflags "${LDFLAGS}" -o dist/agent-sync-linux-arm64 ./cmd/agent-sync
+          # macOS amd64
+          GOOS=darwin GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/agent-sync-darwin-amd64 ./cmd/agent-sync
+          # macOS arm64
+          GOOS=darwin GOARCH=arm64 go build -ldflags "${LDFLAGS}" -o dist/agent-sync-darwin-arm64 ./cmd/agent-sync
+          # Windows amd64
+          GOOS=windows GOARCH=amd64 go build -ldflags "${LDFLAGS}" -o dist/agent-sync-windows-amd64.exe ./cmd/agent-sync
+
+      - name: Create checksums
+        run: |
+          cd dist
+          sha256sum * > checksums.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/agent-sync-*
+            dist/checksums.txt
