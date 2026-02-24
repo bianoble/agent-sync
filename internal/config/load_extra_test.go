@@ -8,16 +8,12 @@ import (
 )
 
 func TestEnvNoInherit(t *testing.T) {
-	// Save and restore env.
-	old := os.Getenv("AGENT_SYNC_NO_INHERIT")
-	defer os.Setenv("AGENT_SYNC_NO_INHERIT", old)
-
 	tests := []struct {
-		name  string
 		value string
+		name  string
 		want  bool
 	}{
-		{"empty", "", false},
+		{"", "empty", false},
 		{"1", "1", true},
 		{"true", "true", true},
 		{"TRUE", "TRUE", true},
@@ -25,12 +21,12 @@ func TestEnvNoInherit(t *testing.T) {
 		{"false", "false", false},
 		{"0", "0", false},
 		{"yes", "yes", false},
-		{"with_spaces", "  true  ", true},
+		{"  true  ", "with_spaces", true},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Setenv("AGENT_SYNC_NO_INHERIT", tt.value)
+			t.Setenv("AGENT_SYNC_NO_INHERIT", tt.value)
 			if got := EnvNoInherit(); got != tt.want {
 				t.Errorf("EnvNoInherit() with %q = %v, want %v", tt.value, got, tt.want)
 			}

@@ -288,9 +288,9 @@ func TestVerifyEngineGitCommitChanged(t *testing.T) {
 
 func TestHasChanged(t *testing.T) {
 	tests := []struct {
-		name     string
 		ls       lock.LockedSource
 		resolved *source.ResolvedSource
+		name     string
 		want     bool
 	}{
 		{

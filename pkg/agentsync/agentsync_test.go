@@ -28,26 +28,31 @@ targets:
 	return cfgPath
 }
 
-// writeLockfile writes a minimal valid lockfile and returns its path.
-func writeLockfile(t *testing.T, dir, fileHash string) string {
+// setupRulesDir creates source directory with a single file.
+func setupRulesDir(t *testing.T, dir string) {
 	t.Helper()
-	lfPath := filepath.Join(dir, "agent-sync.lock")
-	lf := &lock.Lockfile{
-		Version: 1,
-		Sources: []lock.LockedSource{{
-			Name: "rules",
-			Type: "local",
-			Resolved: lock.ResolvedState{
-				Path:  "./rules/",
-				Files: map[string]lock.FileHash{"security.md": {SHA256: fileHash}},
-			},
-			Status: "ok",
-		}},
-	}
-	if err := lock.Save(lfPath, lf); err != nil {
+	rulesDir := filepath.Join(dir, "rules")
+	if err := os.MkdirAll(rulesDir, 0755); err != nil {
 		t.Fatal(err)
 	}
-	return lfPath
+	if err := os.WriteFile(filepath.Join(rulesDir, "security.md"), []byte("content"), 0644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// newTestClient creates a client with isolated temp paths.
+func newTestClient(t *testing.T, dir, cfgPath string) *Client {
+	t.Helper()
+	client, err := New(Options{
+		ProjectRoot:  dir,
+		ConfigPath:   cfgPath,
+		LockfilePath: filepath.Join(dir, "agent-sync.lock"),
+		NoInherit:    true,
+	})
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+	return client
 }
 
 func TestNewDefaultPaths(t *testing.T) {
@@ -126,15 +131,7 @@ func TestClientSync(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	client, err := New(Options{
-		ProjectRoot:  dir,
-		ConfigPath:   cfgPath,
-		LockfilePath: filepath.Join(dir, "agent-sync.lock"),
-		NoInherit:    true,
-	})
-	if err != nil {
-		t.Fatalf("New: %v", err)
-	}
+	client := newTestClient(t, dir, cfgPath)
 
 	// First, update to create lockfile.
 	updateResult, err := client.Update(context.Background(), UpdateOptions{})
@@ -146,9 +143,9 @@ func TestClientSync(t *testing.T) {
 	}
 
 	// Now sync.
-	syncResult, err := client.Sync(context.Background(), SyncOptions{})
-	if err != nil {
-		t.Fatalf("Sync: %v", err)
+	syncResult, syncErr := client.Sync(context.Background(), SyncOptions{})
+	if syncErr != nil {
+		t.Fatalf("Sync: %v", syncErr)
 	}
 	if len(syncResult.Written) == 0 && len(syncResult.Skipped) == 0 {
 		t.Error("expected at least one written or skipped file")
@@ -158,38 +155,23 @@ func TestClientSync(t *testing.T) {
 func TestClientCheckDetectsDrift(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := writeConfig(t, dir)
+	setupRulesDir(t, dir)
 
-	// Create source files.
-	rulesDir := filepath.Join(dir, "rules")
-	if err := os.MkdirAll(rulesDir, 0755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(rulesDir, "security.md"), []byte("content"), 0644); err != nil {
-		t.Fatal(err)
-	}
-
-	client, err := New(Options{
-		ProjectRoot:  dir,
-		ConfigPath:   cfgPath,
-		LockfilePath: filepath.Join(dir, "agent-sync.lock"),
-		NoInherit:    true,
-	})
-	if err != nil {
-		t.Fatalf("New: %v", err)
-	}
+	client := newTestClient(t, dir, cfgPath)
 
 	// Update to create lockfile.
-	if _, err := client.Update(context.Background(), UpdateOptions{}); err != nil {
-		t.Fatalf("Update: %v", err)
+	_, updateErr := client.Update(context.Background(), UpdateOptions{})
+	if updateErr != nil {
+		t.Fatalf("Update: %v", updateErr)
 	}
 
 	// Write a target file with DIFFERENT content to simulate drift.
 	outDir := filepath.Join(dir, ".out")
-	if err := os.MkdirAll(outDir, 0755); err != nil {
-		t.Fatal(err)
+	if mkErr := os.MkdirAll(outDir, 0755); mkErr != nil {
+		t.Fatal(mkErr)
 	}
-	if err := os.WriteFile(filepath.Join(outDir, "security.md"), []byte("drifted content"), 0644); err != nil {
-		t.Fatal(err)
+	if wErr := os.WriteFile(filepath.Join(outDir, "security.md"), []byte("drifted content"), 0644); wErr != nil {
+		t.Fatal(wErr)
 	}
 
 	checkResult, err := client.Check(context.Background())
@@ -207,28 +189,14 @@ func TestClientCheckDetectsDrift(t *testing.T) {
 func TestClientCheckDetectsMissing(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := writeConfig(t, dir)
+	setupRulesDir(t, dir)
 
-	rulesDir := filepath.Join(dir, "rules")
-	if err := os.MkdirAll(rulesDir, 0755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(rulesDir, "security.md"), []byte("content"), 0644); err != nil {
-		t.Fatal(err)
-	}
-
-	client, err := New(Options{
-		ProjectRoot:  dir,
-		ConfigPath:   cfgPath,
-		LockfilePath: filepath.Join(dir, "agent-sync.lock"),
-		NoInherit:    true,
-	})
-	if err != nil {
-		t.Fatalf("New: %v", err)
-	}
+	client := newTestClient(t, dir, cfgPath)
 
 	// Update to create lockfile, don't sync — files should be missing.
-	if _, err := client.Update(context.Background(), UpdateOptions{}); err != nil {
-		t.Fatalf("Update: %v", err)
+	_, updateErr := client.Update(context.Background(), UpdateOptions{})
+	if updateErr != nil {
+		t.Fatalf("Update: %v", updateErr)
 	}
 
 	checkResult, err := client.Check(context.Background())
@@ -246,24 +214,9 @@ func TestClientCheckDetectsMissing(t *testing.T) {
 func TestClientPrune(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := writeConfig(t, dir)
+	setupRulesDir(t, dir)
 
-	rulesDir := filepath.Join(dir, "rules")
-	if err := os.MkdirAll(rulesDir, 0755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(rulesDir, "security.md"), []byte("content"), 0644); err != nil {
-		t.Fatal(err)
-	}
-
-	client, err := New(Options{
-		ProjectRoot:  dir,
-		ConfigPath:   cfgPath,
-		LockfilePath: filepath.Join(dir, "agent-sync.lock"),
-		NoInherit:    true,
-	})
-	if err != nil {
-		t.Fatalf("New: %v", err)
-	}
+	client := newTestClient(t, dir, cfgPath)
 
 	pruneResult, err := client.Prune(context.Background(), PruneOptions{DryRun: true})
 	if err != nil {
@@ -275,28 +228,14 @@ func TestClientPrune(t *testing.T) {
 func TestClientVerify(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := writeConfig(t, dir)
+	setupRulesDir(t, dir)
 
-	rulesDir := filepath.Join(dir, "rules")
-	if err := os.MkdirAll(rulesDir, 0755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(rulesDir, "security.md"), []byte("content"), 0644); err != nil {
-		t.Fatal(err)
-	}
-
-	client, err := New(Options{
-		ProjectRoot:  dir,
-		ConfigPath:   cfgPath,
-		LockfilePath: filepath.Join(dir, "agent-sync.lock"),
-		NoInherit:    true,
-	})
-	if err != nil {
-		t.Fatalf("New: %v", err)
-	}
+	client := newTestClient(t, dir, cfgPath)
 
 	// Update first to create lockfile.
-	if _, err := client.Update(context.Background(), UpdateOptions{}); err != nil {
-		t.Fatalf("Update: %v", err)
+	_, updateErr := client.Update(context.Background(), UpdateOptions{})
+	if updateErr != nil {
+		t.Fatalf("Update: %v", updateErr)
 	}
 
 	verifyResult, err := client.Verify(context.Background(), nil)
@@ -312,14 +251,7 @@ func TestClientUpdateDryRun(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := writeConfig(t, dir)
 	lfPath := filepath.Join(dir, "agent-sync.lock")
-
-	rulesDir := filepath.Join(dir, "rules")
-	if err := os.MkdirAll(rulesDir, 0755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(rulesDir, "security.md"), []byte("content"), 0644); err != nil {
-		t.Fatal(err)
-	}
+	setupRulesDir(t, dir)
 
 	client, err := New(Options{
 		ProjectRoot:  dir,
@@ -331,9 +263,9 @@ func TestClientUpdateDryRun(t *testing.T) {
 		t.Fatalf("New: %v", err)
 	}
 
-	result, err := client.Update(context.Background(), UpdateOptions{DryRun: true})
-	if err != nil {
-		t.Fatalf("Update dry-run: %v", err)
+	result, updateErr := client.Update(context.Background(), UpdateOptions{DryRun: true})
+	if updateErr != nil {
+		t.Fatalf("Update dry-run: %v", updateErr)
 	}
 	if len(result.Updated) != 1 {
 		t.Errorf("updated = %d, want 1", len(result.Updated))
@@ -343,7 +275,7 @@ func TestClientUpdateDryRun(t *testing.T) {
 	}
 
 	// Lockfile should NOT be created.
-	if _, err := os.Stat(lfPath); !os.IsNotExist(err) {
+	if _, statErr := os.Stat(lfPath); !os.IsNotExist(statErr) {
 		t.Error("dry-run should not create lockfile")
 	}
 }
@@ -380,15 +312,7 @@ targets:
 		}
 	}
 
-	client, err := New(Options{
-		ProjectRoot:  dir,
-		ConfigPath:   cfgPath,
-		LockfilePath: filepath.Join(dir, "agent-sync.lock"),
-		NoInherit:    true,
-	})
-	if err != nil {
-		t.Fatalf("New: %v", err)
-	}
+	client := newTestClient(t, dir, cfgPath)
 
 	result, err := client.Update(context.Background(), UpdateOptions{
 		SourceNames: []string{"src-a"},
@@ -406,39 +330,39 @@ targets:
 
 func TestSummarizeLocked(t *testing.T) {
 	tests := []struct {
-		name string
 		ls   lock.LockedSource
+		name string
 		want string
 	}{
 		{
-			name: "git commit",
 			ls: lock.LockedSource{
 				Type:     "git",
 				Resolved: lock.ResolvedState{Commit: "abcdef1234567890"},
 			},
+			name: "git commit",
 			want: "abcdef12",
 		},
 		{
-			name: "url sha256",
 			ls: lock.LockedSource{
 				Type:     "url",
 				Resolved: lock.ResolvedState{SHA256: "abcdef1234567890"},
 			},
+			name: "url sha256",
 			want: "sha256:abcdef12",
 		},
 		{
-			name: "local files",
 			ls: lock.LockedSource{
 				Type: "local",
 				Resolved: lock.ResolvedState{
 					Files: map[string]lock.FileHash{"a.md": {SHA256: "h1"}, "b.md": {SHA256: "h2"}},
 				},
 			},
+			name: "local files",
 			want: "(2 files)",
 		},
 		{
-			name: "unknown",
 			ls:   lock.LockedSource{Type: "custom"},
+			name: "unknown",
 			want: "(unknown)",
 		},
 	}
@@ -456,28 +380,14 @@ func TestSummarizeLocked(t *testing.T) {
 func TestClientSyncDryRun(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := writeConfig(t, dir)
+	setupRulesDir(t, dir)
 
-	rulesDir := filepath.Join(dir, "rules")
-	if err := os.MkdirAll(rulesDir, 0755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(rulesDir, "security.md"), []byte("content"), 0644); err != nil {
-		t.Fatal(err)
-	}
-
-	client, err := New(Options{
-		ProjectRoot:  dir,
-		ConfigPath:   cfgPath,
-		LockfilePath: filepath.Join(dir, "agent-sync.lock"),
-		NoInherit:    true,
-	})
-	if err != nil {
-		t.Fatalf("New: %v", err)
-	}
+	client := newTestClient(t, dir, cfgPath)
 
 	// Update to create lockfile.
-	if _, err := client.Update(context.Background(), UpdateOptions{}); err != nil {
-		t.Fatalf("Update: %v", err)
+	_, updateErr := client.Update(context.Background(), UpdateOptions{})
+	if updateErr != nil {
+		t.Fatalf("Update: %v", updateErr)
 	}
 
 	// Sync in dry-run mode.
@@ -491,24 +401,9 @@ func TestClientSyncDryRun(t *testing.T) {
 func TestToolMap(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := writeConfig(t, dir)
+	setupRulesDir(t, dir)
 
-	rulesDir := filepath.Join(dir, "rules")
-	if err := os.MkdirAll(rulesDir, 0755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(rulesDir, "security.md"), []byte("content"), 0644); err != nil {
-		t.Fatal(err)
-	}
-
-	client, err := New(Options{
-		ProjectRoot:  dir,
-		ConfigPath:   cfgPath,
-		LockfilePath: filepath.Join(dir, "agent-sync.lock"),
-		NoInherit:    true,
-	})
-	if err != nil {
-		t.Fatalf("New: %v", err)
-	}
+	client := newTestClient(t, dir, cfgPath)
 
 	cfg, err := client.loadConfig()
 	if err != nil {

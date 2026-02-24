@@ -140,6 +140,6 @@ func TestLocalResolverCancelledContext(t *testing.T) {
 
 	_, err := r.Resolve(ctx, src, root)
 	if err == nil {
-		t.Fatal("expected error for cancelled context")
+		t.Fatal("expected error for canceled context")
 	}
 }
