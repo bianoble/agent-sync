@@ -9,12 +9,12 @@ import (
 // InfoResult holds tool information for the info command.
 type InfoResult struct {
 	Version     string
-	SpecVersion int
 	ConfigPath  string
 	LockPath    string
 	CacheDir    string
-	CacheSize   int64
 	Tools       []ToolInfo
+	CacheSize   int64
+	SpecVersion int
 }
 
 // ToolInfo describes a tool definition.

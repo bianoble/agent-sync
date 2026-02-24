@@ -11,7 +11,9 @@ import (
 
 func TestOverrideAppend(t *testing.T) {
 	root := t.TempDir()
-	os.WriteFile(filepath.Join(root, "extra.md"), []byte("appended content"), 0644)
+	if err := os.WriteFile(filepath.Join(root, "extra.md"), []byte("appended content"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	p := &OverrideProcessor{ProjectRoot: root}
 	files := map[string][]byte{
@@ -37,7 +39,9 @@ func TestOverrideAppend(t *testing.T) {
 
 func TestOverridePrepend(t *testing.T) {
 	root := t.TempDir()
-	os.WriteFile(filepath.Join(root, "header.md"), []byte("prepended content"), 0644)
+	if err := os.WriteFile(filepath.Join(root, "header.md"), []byte("prepended content"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	p := &OverrideProcessor{ProjectRoot: root}
 	files := map[string][]byte{
@@ -63,7 +67,9 @@ func TestOverridePrepend(t *testing.T) {
 
 func TestOverrideReplace(t *testing.T) {
 	root := t.TempDir()
-	os.WriteFile(filepath.Join(root, "replacement.md"), []byte("completely new"), 0644)
+	if err := os.WriteFile(filepath.Join(root, "replacement.md"), []byte("completely new"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	p := &OverrideProcessor{ProjectRoot: root}
 	files := map[string][]byte{
@@ -85,7 +91,9 @@ func TestOverrideReplace(t *testing.T) {
 
 func TestOverrideTargetNotFound(t *testing.T) {
 	root := t.TempDir()
-	os.WriteFile(filepath.Join(root, "extra.md"), []byte("content"), 0644)
+	if err := os.WriteFile(filepath.Join(root, "extra.md"), []byte("content"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	p := &OverrideProcessor{ProjectRoot: root}
 	files := map[string][]byte{} // no synced files
@@ -121,7 +129,9 @@ func TestValidateOverridesFileMissing(t *testing.T) {
 
 func TestValidateOverridesFileExists(t *testing.T) {
 	root := t.TempDir()
-	os.WriteFile(filepath.Join(root, "override.md"), []byte("content"), 0644)
+	if err := os.WriteFile(filepath.Join(root, "override.md"), []byte("content"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	p := &OverrideProcessor{ProjectRoot: root}
 	overrides := []config.Override{
@@ -170,7 +180,9 @@ func TestDetectConflictsWithOverride(t *testing.T) {
 
 func TestOverrideDoesNotMutateOriginal(t *testing.T) {
 	root := t.TempDir()
-	os.WriteFile(filepath.Join(root, "extra.md"), []byte("added"), 0644)
+	if err := os.WriteFile(filepath.Join(root, "extra.md"), []byte("added"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	p := &OverrideProcessor{ProjectRoot: root}
 	original := []byte("original content")

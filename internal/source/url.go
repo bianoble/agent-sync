@@ -47,8 +47,8 @@ func (u *URLResolver) Resolve(ctx context.Context, src config.Source, projectRoo
 		return nil, &SourceError{
 			Source:    src.Name,
 			Operation: "resolve",
-			Err:      fmt.Errorf("checksum mismatch: expected %s, got %s", expectedHash, actualHash),
-			Hint:     "the upstream content has changed — update the checksum in your config",
+			Err:       fmt.Errorf("checksum mismatch: expected %s, got %s", expectedHash, actualHash),
+			Hint:      "the upstream content has changed — update the checksum in your config",
 		}
 	}
 
@@ -82,7 +82,7 @@ func (u *URLResolver) Fetch(ctx context.Context, resolved *ResolvedSource) ([]Fe
 			return nil, &SourceError{
 				Source:    resolved.Name,
 				Operation: "fetch",
-				Err:      fmt.Errorf("hash mismatch for %s: expected %s, got %s", relPath, expectedHash, actualHash),
+				Err:       fmt.Errorf("hash mismatch for %s: expected %s, got %s", relPath, expectedHash, actualHash),
 			}
 		}
 		return []FetchedFile{
@@ -118,14 +118,14 @@ func (u *URLResolver) fetchURL(ctx context.Context, url, sourceName string) ([]b
 	if err != nil {
 		return nil, &SourceError{Source: sourceName, Operation: "fetch", Err: fmt.Errorf("fetching %s: %w", url, err), Hint: "check network connectivity and URL"}
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, &SourceError{
 			Source:    sourceName,
 			Operation: "fetch",
-			Err:      fmt.Errorf("HTTP %d from %s", resp.StatusCode, url),
-			Hint:     "check that the URL is accessible and returns the expected content",
+			Err:       fmt.Errorf("HTTP %d from %s", resp.StatusCode, url),
+			Hint:      "check that the URL is accessible and returns the expected content",
 		}
 	}
 
@@ -143,8 +143,8 @@ func (u *URLResolver) fetchURL(ctx context.Context, url, sourceName string) ([]b
 		return nil, &SourceError{
 			Source:    sourceName,
 			Operation: "fetch",
-			Err:      fmt.Errorf("file exceeds max size %d bytes", u.MaxSize),
-			Hint:     "increase max_file_size or use a smaller file",
+			Err:       fmt.Errorf("file exceeds max size %d bytes", u.MaxSize),
+			Hint:      "increase max_file_size or use a smaller file",
 		}
 	}
 

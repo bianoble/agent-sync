@@ -16,8 +16,8 @@ func TestPutAndGet(t *testing.T) {
 	content := []byte("hello world")
 	hash := ComputeHash(content)
 
-	if err := c.Put(hash, content); err != nil {
-		t.Fatalf("Put: %v", err)
+	if putErr := c.Put(hash, content); putErr != nil {
+		t.Fatalf("Put: %v", putErr)
 	}
 
 	got, found, err := c.Get(hash)
@@ -72,11 +72,11 @@ func TestPutIdempotent(t *testing.T) {
 	hash := ComputeHash(content)
 
 	// Put twice — should not error.
-	if err := c.Put(hash, content); err != nil {
-		t.Fatalf("first Put: %v", err)
+	if putErr := c.Put(hash, content); putErr != nil {
+		t.Fatalf("first Put: %v", putErr)
 	}
-	if err := c.Put(hash, content); err != nil {
-		t.Fatalf("second Put: %v", err)
+	if putErr := c.Put(hash, content); putErr != nil {
+		t.Fatalf("second Put: %v", putErr)
 	}
 }
 
@@ -90,14 +90,14 @@ func TestCorruptCacheEntry(t *testing.T) {
 	content := []byte("original content")
 	hash := ComputeHash(content)
 
-	if err := c.Put(hash, content); err != nil {
-		t.Fatal(err)
+	if putErr := c.Put(hash, content); putErr != nil {
+		t.Fatal(putErr)
 	}
 
 	// Corrupt the cache entry.
 	objPath := c.objectPath(hash)
-	if err := os.WriteFile(objPath, []byte("corrupted"), 0644); err != nil {
-		t.Fatal(err)
+	if writeErr := os.WriteFile(objPath, []byte("corrupted"), 0644); writeErr != nil {
+		t.Fatal(writeErr)
 	}
 
 	// Get should detect corruption and return miss (self-healing).
@@ -110,7 +110,7 @@ func TestCorruptCacheEntry(t *testing.T) {
 	}
 
 	// Corrupt file should be cleaned up.
-	if _, err := os.Stat(objPath); !os.IsNotExist(err) {
+	if _, statErr := os.Stat(objPath); !os.IsNotExist(statErr) {
 		t.Error("corrupt cache entry should be removed")
 	}
 }
@@ -129,8 +129,8 @@ func TestHas(t *testing.T) {
 		t.Fatal("expected Has=false before Put")
 	}
 
-	if err := c.Put(hash, content); err != nil {
-		t.Fatal(err)
+	if putErr := c.Put(hash, content); putErr != nil {
+		t.Fatal(putErr)
 	}
 
 	if !c.Has(hash) {
@@ -147,8 +147,8 @@ func TestSize(t *testing.T) {
 
 	content := []byte("some content for size test")
 	hash := ComputeHash(content)
-	if err := c.Put(hash, content); err != nil {
-		t.Fatal(err)
+	if putErr := c.Put(hash, content); putErr != nil {
+		t.Fatal(putErr)
 	}
 
 	size, err := c.Size()
@@ -175,9 +175,15 @@ func TestPath(t *testing.T) {
 func TestDefaultDir(t *testing.T) {
 	// Test with XDG_CACHE_HOME set.
 	original := os.Getenv("XDG_CACHE_HOME")
-	defer os.Setenv("XDG_CACHE_HOME", original)
+	defer func() {
+		if err := os.Setenv("XDG_CACHE_HOME", original); err != nil {
+			t.Errorf("failed to restore XDG_CACHE_HOME: %v", err)
+		}
+	}()
 
-	os.Setenv("XDG_CACHE_HOME", "/custom/cache")
+	if err := os.Setenv("XDG_CACHE_HOME", "/custom/cache"); err != nil {
+		t.Fatalf("failed to set XDG_CACHE_HOME: %v", err)
+	}
 	got := DefaultDir()
 	want := filepath.Join("/custom/cache", "agent-sync")
 	if got != want {
@@ -185,7 +191,9 @@ func TestDefaultDir(t *testing.T) {
 	}
 
 	// Test without XDG_CACHE_HOME.
-	os.Unsetenv("XDG_CACHE_HOME")
+	if err := os.Unsetenv("XDG_CACHE_HOME"); err != nil {
+		t.Fatalf("failed to unset XDG_CACHE_HOME: %v", err)
+	}
 	got = DefaultDir()
 	if got == "" {
 		t.Error("DefaultDir should not be empty")

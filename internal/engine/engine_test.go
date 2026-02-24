@@ -15,9 +15,9 @@ import (
 
 // mockResolver is a test resolver that returns predefined content.
 type mockResolver struct {
+	err      error
 	resolved *source.ResolvedSource
 	files    []source.FetchedFile
-	err      error
 }
 
 func (m *mockResolver) Resolve(ctx context.Context, src config.Source, projectRoot string) (*source.ResolvedSource, error) {
@@ -178,8 +178,12 @@ func TestSyncEngineSkipsUnchanged(t *testing.T) {
 
 	// Pre-write the file so it's already there.
 	destDir := filepath.Join(projectRoot, ".out")
-	os.MkdirAll(destDir, 0755)
-	os.WriteFile(filepath.Join(destDir, "file.md"), content, 0644)
+	if err := os.MkdirAll(destDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(destDir, "file.md"), content, 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	reg := newTestRegistry(map[string]*mockResolver{
 		"local": {
@@ -234,8 +238,12 @@ func TestCheckEngineClean(t *testing.T) {
 
 	// Write the expected file.
 	destDir := filepath.Join(projectRoot, ".custom/rules")
-	os.MkdirAll(destDir, 0755)
-	os.WriteFile(filepath.Join(destDir, "security.md"), content, 0644)
+	if err := os.MkdirAll(destDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(destDir, "security.md"), content, 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	eng := &CheckEngine{
 		ToolMap:     target.NewToolMap(nil),
@@ -273,8 +281,12 @@ func TestCheckEngineDrift(t *testing.T) {
 
 	// Write a file with different content.
 	destDir := filepath.Join(projectRoot, ".out")
-	os.MkdirAll(destDir, 0755)
-	os.WriteFile(filepath.Join(destDir, "file.md"), []byte("modified"), 0644)
+	if err := os.MkdirAll(destDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(destDir, "file.md"), []byte("modified"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	eng := &CheckEngine{
 		ToolMap:     target.NewToolMap(nil),
@@ -482,8 +494,12 @@ func TestStatusEngine(t *testing.T) {
 	contentHash := sha256Hex(content)
 
 	destDir := filepath.Join(projectRoot, ".out")
-	os.MkdirAll(destDir, 0755)
-	os.WriteFile(filepath.Join(destDir, "file.md"), content, 0644)
+	if err := os.MkdirAll(destDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(destDir, "file.md"), content, 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	eng := &StatusEngine{
 		ToolMap:     target.NewToolMap(nil),

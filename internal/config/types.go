@@ -3,13 +3,13 @@ package config
 // Config represents the agent-sync.yaml configuration file.
 // See spec Section 3.
 type Config struct {
-	Version         int               `yaml:"version"`
 	Variables       map[string]string `yaml:"variables,omitempty"`
 	Sources         []Source          `yaml:"sources"`
 	Targets         []Target          `yaml:"targets"`
 	Overrides       []Override        `yaml:"overrides,omitempty"`
 	Transforms      []Transform       `yaml:"transforms,omitempty"`
 	ToolDefinitions []ToolDefinition  `yaml:"tool_definitions,omitempty"`
+	Version         int               `yaml:"version"`
 }
 
 // Source defines an external source of agent files.
@@ -17,11 +17,8 @@ type Config struct {
 type Source struct {
 	Name string `yaml:"name"`
 	Type string `yaml:"type"` // "git", "url", "local"
-
-	// Git source fields (Section 5.1).
-	Repo  string   `yaml:"repo,omitempty"`
-	Ref   string   `yaml:"ref,omitempty"`
-	Paths []string `yaml:"paths,omitempty"`
+	Repo string `yaml:"repo,omitempty"`
+	Ref  string `yaml:"ref,omitempty"`
 
 	// URL source fields (Section 5.2).
 	URL      string `yaml:"url,omitempty"`
@@ -29,14 +26,17 @@ type Source struct {
 
 	// Local source fields (Section 5.3).
 	Path string `yaml:"path,omitempty"`
+
+	// Git source fields (Section 5.1).
+	Paths []string `yaml:"paths,omitempty"`
 }
 
 // Target defines where source files are written.
 // See spec Section 7.
 type Target struct {
 	Source      string   `yaml:"source"`
-	Tools       []string `yaml:"tools,omitempty"`
 	Destination string   `yaml:"destination,omitempty"`
+	Tools       []string `yaml:"tools,omitempty"`
 }
 
 // Override defines a post-sync modification to a target file.

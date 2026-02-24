@@ -104,8 +104,8 @@ func TestSaveAtomicity(t *testing.T) {
 		t.Fatal(err)
 	}
 	var check Lockfile
-	if err := yaml.Unmarshal(data, &check); err != nil {
-		t.Fatal(err)
+	if unmarshalErr := yaml.Unmarshal(data, &check); unmarshalErr != nil {
+		t.Fatal(unmarshalErr)
 	}
 	if check.Sources[0].Name != "first" {
 		t.Errorf("initial name = %q, want %q", check.Sources[0].Name, "first")
@@ -118,8 +118,8 @@ func TestSaveAtomicity(t *testing.T) {
 			{Name: "second", Type: "local", Resolved: ResolvedState{Path: "./b/"}, Status: "ok"},
 		},
 	}
-	if err := Save(path, updated); err != nil {
-		t.Fatalf("updated Save: %v", err)
+	if saveErr := Save(path, updated); saveErr != nil {
+		t.Fatalf("updated Save: %v", saveErr)
 	}
 
 	loaded, err := Load(path)

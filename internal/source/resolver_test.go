@@ -30,8 +30,8 @@ func TestSourceErrorFormat(t *testing.T) {
 	err := &SourceError{
 		Source:    "my-source",
 		Operation: "resolve",
-		Err:      fmt.Errorf("connection refused"),
-		Hint:     "check network connectivity",
+		Err:       fmt.Errorf("connection refused"),
+		Hint:      "check network connectivity",
 	}
 	msg := err.Error()
 	if !strings.Contains(msg, "my-source") {

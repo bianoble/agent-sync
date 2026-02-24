@@ -61,8 +61,8 @@ func (e *SyncEngine) Sync(ctx context.Context, lf lock.Lockfile, cfg config.Conf
 	// Collect all file operations to perform.
 	type fileOp struct {
 		destPath string // relative to project root
-		content  []byte
 		source   string
+		content  []byte
 	}
 	var ops []fileOp
 

@@ -38,7 +38,7 @@ func (l *LocalResolver) Resolve(ctx context.Context, src config.Source, projectR
 		return nil, &SourceError{
 			Source:    src.Name,
 			Operation: "resolve",
-			Err:      fmt.Errorf("path '%s' resolves outside project root", src.Path),
+			Err:       fmt.Errorf("path '%s' resolves outside project root", src.Path),
 		}
 	}
 
@@ -94,8 +94,8 @@ func (l *LocalResolver) Resolve(ctx context.Context, src config.Source, projectR
 		return nil, &SourceError{
 			Source:    src.Name,
 			Operation: "resolve",
-			Err:      fmt.Errorf("no files found at '%s'", src.Path),
-			Hint:     "the path exists but contains no files",
+			Err:       fmt.Errorf("no files found at '%s'", src.Path),
+			Hint:      "the path exists but contains no files",
 		}
 	}
 
@@ -160,8 +160,8 @@ func (l *LocalResolver) FetchWithRoot(ctx context.Context, resolved *ResolvedSou
 			return nil, &SourceError{
 				Source:    resolved.Name,
 				Operation: "fetch",
-				Err:      fmt.Errorf("hash mismatch for %s: expected %s, got %s", relPath, expectedHash, actualHash),
-				Hint:     "local file has changed since last update — run 'agent-sync update' to re-lock",
+				Err:       fmt.Errorf("hash mismatch for %s: expected %s, got %s", relPath, expectedHash, actualHash),
+				Hint:      "local file has changed since last update — run 'agent-sync update' to re-lock",
 			}
 		}
 

@@ -21,8 +21,8 @@ type SourceStatus struct {
 	Name     string
 	Type     string
 	PinnedAt string
-	Targets  []string
 	State    string // "synced", "drifted", "missing", "pending"
+	Targets  []string
 }
 
 // Status returns the state of all (or named) sources.

@@ -22,29 +22,29 @@ type Resolver interface {
 
 // ResolvedSource holds the fully resolved, immutable state of a source.
 type ResolvedSource struct {
+	Files  map[string]string // relative path -> sha256 hash
 	Name   string
 	Type   string
-	Commit string            // git only
-	Tree   string            // git only
-	URL    string            // url only
-	Repo   string            // git only
-	Path   string            // local only
-	Files  map[string]string // relative path -> sha256 hash
+	Commit string // git only
+	Tree   string // git only
+	URL    string // url only
+	Repo   string // git only
+	Path   string // local only
 }
 
 // FetchedFile holds the content of a single fetched file.
 type FetchedFile struct {
 	RelPath string
-	Content []byte
 	SHA256  string
+	Content []byte
 }
 
 // SourceError represents an error associated with a specific source operation.
 type SourceError struct {
 	Source    string
 	Operation string
-	Err      error
-	Hint     string
+	Err       error
+	Hint      string
 }
 
 func (e *SourceError) Error() string {
@@ -113,13 +113,15 @@ type HTTPClient interface {
 // OSFS implements FS using the real operating system filesystem.
 type OSFS struct{}
 
-func (OSFS) ReadFile(path string) ([]byte, error)                    { return os.ReadFile(path) }
-func (OSFS) WriteFile(path string, data []byte, perm os.FileMode) error { return os.WriteFile(path, data, perm) }
-func (OSFS) Walk(root string, fn filepath.WalkFunc) error            { return filepath.Walk(root, fn) }
-func (OSFS) Stat(path string) (os.FileInfo, error)                   { return os.Stat(path) }
-func (OSFS) MkdirAll(path string, perm os.FileMode) error            { return os.MkdirAll(path, perm) }
-func (OSFS) Remove(path string) error                                { return os.Remove(path) }
-func (OSFS) Rename(oldpath, newpath string) error                    { return os.Rename(oldpath, newpath) }
+func (OSFS) ReadFile(path string) ([]byte, error) { return os.ReadFile(path) }
+func (OSFS) WriteFile(path string, data []byte, perm os.FileMode) error {
+	return os.WriteFile(path, data, perm)
+}
+func (OSFS) Walk(root string, fn filepath.WalkFunc) error { return filepath.Walk(root, fn) }
+func (OSFS) Stat(path string) (os.FileInfo, error)        { return os.Stat(path) }
+func (OSFS) MkdirAll(path string, perm os.FileMode) error { return os.MkdirAll(path, perm) }
+func (OSFS) Remove(path string) error                     { return os.Remove(path) }
+func (OSFS) Rename(oldpath, newpath string) error         { return os.Rename(oldpath, newpath) }
 
 // DefaultHTTPClient returns an HTTPClient using http.DefaultClient.
 type DefaultHTTPClient struct{}

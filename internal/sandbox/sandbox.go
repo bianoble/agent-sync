@@ -82,8 +82,8 @@ func SafeWrite(projectRoot, relPath string, content []byte, perm os.FileMode) er
 		return fmt.Errorf("parent directory escapes sandbox: %w", err)
 	}
 	_ = parentResolved
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return fmt.Errorf("creating directory %s: %w", dir, err)
+	if mkdirErr := os.MkdirAll(dir, 0755); mkdirErr != nil {
+		return fmt.Errorf("creating directory %s: %w", dir, mkdirErr)
 	}
 
 	// Write to temp file in the same directory (ensures same filesystem for rename).

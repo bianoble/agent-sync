@@ -8,8 +8,8 @@ type FileAction struct {
 
 // SourceError represents an error associated with a specific source.
 type SourceError struct {
-	Source string
 	Err    error
+	Source string
 }
 
 func (e SourceError) Error() string {
@@ -43,9 +43,9 @@ type SyncResult struct {
 
 // CheckResult holds the outcome of a check operation.
 type CheckResult struct {
-	Clean   bool
 	Drifted []DriftEntry
 	Missing []string
+	Clean   bool
 }
 
 // VerifyResult holds the outcome of a verify operation.

@@ -69,10 +69,10 @@ func TestGitResolverWithLocalRepo(t *testing.T) {
 
 	r := &GitResolver{}
 	src := config.Source{
-		Name: "test-git",
-		Type: "git",
-		Repo: bareRepo,
-		Ref:  "main",
+		Name:  "test-git",
+		Type:  "git",
+		Repo:  bareRepo,
+		Ref:   "main",
 		Paths: []string{"core/"},
 	}
 
@@ -130,8 +130,12 @@ func TestGitResolverNoPathFilter(t *testing.T) {
 	}
 
 	run(workDir, "init", "-b", "main")
-	os.WriteFile(filepath.Join(workDir, "a.md"), []byte("a"), 0644)
-	os.WriteFile(filepath.Join(workDir, "b.md"), []byte("b"), 0644)
+	if err := os.WriteFile(filepath.Join(workDir, "a.md"), []byte("a"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(workDir, "b.md"), []byte("b"), 0644); err != nil {
+		t.Fatal(err)
+	}
 	run(workDir, "add", ".")
 	run(workDir, "commit", "-m", "init")
 	run(workDir, "clone", "--bare", workDir, bareRepo)

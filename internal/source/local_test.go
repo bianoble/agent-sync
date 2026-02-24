@@ -13,9 +13,15 @@ import (
 func TestLocalResolverDirectory(t *testing.T) {
 	root := t.TempDir()
 	agentsDir := filepath.Join(root, "agents", "standards")
-	os.MkdirAll(agentsDir, 0755)
-	os.WriteFile(filepath.Join(agentsDir, "naming.md"), []byte("# Naming\n"), 0644)
-	os.WriteFile(filepath.Join(agentsDir, "testing.md"), []byte("# Testing\n"), 0644)
+	if err := os.MkdirAll(agentsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(agentsDir, "naming.md"), []byte("# Naming\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(agentsDir, "testing.md"), []byte("# Testing\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	r := &LocalResolver{}
 	src := config.Source{Name: "standards", Type: "local", Path: "./agents/standards/"}
@@ -44,7 +50,9 @@ func TestLocalResolverDirectory(t *testing.T) {
 
 func TestLocalResolverSingleFile(t *testing.T) {
 	root := t.TempDir()
-	os.WriteFile(filepath.Join(root, "policy.md"), []byte("# Policy\n"), 0644)
+	if err := os.WriteFile(filepath.Join(root, "policy.md"), []byte("# Policy\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	r := &LocalResolver{}
 	src := config.Source{Name: "policy", Type: "local", Path: "./policy.md"}
@@ -84,7 +92,9 @@ func TestLocalResolverNonexistentPath(t *testing.T) {
 
 func TestLocalResolverEmptyDirectory(t *testing.T) {
 	root := t.TempDir()
-	os.MkdirAll(filepath.Join(root, "empty"), 0755)
+	if err := os.MkdirAll(filepath.Join(root, "empty"), 0755); err != nil {
+		t.Fatal(err)
+	}
 
 	r := &LocalResolver{}
 	src := config.Source{Name: "empty", Type: "local", Path: "./empty/"}
@@ -112,9 +122,15 @@ func TestLocalResolverRejectsEscapePath(t *testing.T) {
 func TestLocalResolverSkipsHiddenFiles(t *testing.T) {
 	root := t.TempDir()
 	dir := filepath.Join(root, "src")
-	os.MkdirAll(dir, 0755)
-	os.WriteFile(filepath.Join(dir, "visible.md"), []byte("visible"), 0644)
-	os.WriteFile(filepath.Join(dir, ".hidden"), []byte("hidden"), 0644)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "visible.md"), []byte("visible"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, ".hidden"), []byte("hidden"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	r := &LocalResolver{}
 	src := config.Source{Name: "test", Type: "local", Path: "./src/"}
@@ -131,8 +147,12 @@ func TestLocalResolverSkipsHiddenFiles(t *testing.T) {
 func TestLocalFetchWithRoot(t *testing.T) {
 	root := t.TempDir()
 	dir := filepath.Join(root, "agents")
-	os.MkdirAll(dir, 0755)
-	os.WriteFile(filepath.Join(dir, "rules.md"), []byte("# Rules\n"), 0644)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "rules.md"), []byte("# Rules\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	r := &LocalResolver{}
 	src := config.Source{Name: "test", Type: "local", Path: "./agents/"}
@@ -157,8 +177,12 @@ func TestLocalFetchWithRoot(t *testing.T) {
 func TestLocalFetchHashMismatch(t *testing.T) {
 	root := t.TempDir()
 	dir := filepath.Join(root, "src")
-	os.MkdirAll(dir, 0755)
-	os.WriteFile(filepath.Join(dir, "file.md"), []byte("original"), 0644)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "file.md"), []byte("original"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	r := &LocalResolver{}
 	resolved := &ResolvedSource{

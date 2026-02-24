@@ -23,7 +23,7 @@ func TestURLResolverSuccess(t *testing.T) {
 	hash := sha256Hex(content)
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write(content)
+		_, _ = w.Write(content)
 	}))
 	defer srv.Close()
 
@@ -56,7 +56,7 @@ func TestURLResolverSuccess(t *testing.T) {
 
 func TestURLResolverChecksumMismatch(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("actual content"))
+		_, _ = w.Write([]byte("actual content"))
 	}))
 	defer srv.Close()
 
@@ -102,7 +102,7 @@ func TestURLResolverHTTPError(t *testing.T) {
 
 func TestURLResolverMaxSize(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write(make([]byte, 1024))
+		_, _ = w.Write(make([]byte, 1024))
 	}))
 	defer srv.Close()
 
@@ -176,7 +176,7 @@ func TestURLFetch(t *testing.T) {
 	hash := sha256Hex(content)
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write(content)
+		_, _ = w.Write(content)
 	}))
 	defer srv.Close()
 
@@ -203,7 +203,7 @@ func TestURLFetch(t *testing.T) {
 func TestURLResolverTimeout(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(2 * time.Second)
-		w.Write([]byte("slow"))
+		_, _ = w.Write([]byte("slow"))
 	}))
 	defer srv.Close()
 

@@ -66,16 +66,6 @@ func newCache() (*cache.Cache, error) {
 	return cache.New(cache.DefaultDir())
 }
 
-// printQuiet returns true if only errors should be shown.
-func printQuiet() bool {
-	return quiet
-}
-
-// printVerbose returns true if detailed output is requested.
-func printVerbose() bool {
-	return verbose
-}
-
 // info prints a line unless quiet mode is active.
 func info(format string, args ...any) {
 	if !quiet {

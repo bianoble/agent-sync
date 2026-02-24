@@ -29,11 +29,11 @@ func (g *GitResolver) Resolve(ctx context.Context, src config.Source, projectRoo
 	if err != nil {
 		return nil, &SourceError{Source: src.Name, Operation: "resolve", Err: fmt.Errorf("creating temp dir: %w", err)}
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	// Shallow clone with the specified ref.
-	if err := gitClone(ctx, src.Repo, src.Ref, tmpDir); err != nil {
-		return nil, &SourceError{Source: src.Name, Operation: "resolve", Err: err, Hint: "check repo URL, ref, and authentication"}
+	if cloneErr := gitClone(ctx, src.Repo, src.Ref, tmpDir); cloneErr != nil {
+		return nil, &SourceError{Source: src.Name, Operation: "resolve", Err: cloneErr, Hint: "check repo URL, ref, and authentication"}
 	}
 
 	// Resolve commit SHA.
@@ -115,11 +115,11 @@ func (g *GitResolver) Fetch(ctx context.Context, resolved *ResolvedSource) ([]Fe
 	if err != nil {
 		return nil, &SourceError{Source: resolved.Name, Operation: "fetch", Err: err}
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	// Clone at the resolved commit.
-	if err := gitCloneAtCommit(ctx, resolved.Repo, resolved.Commit, tmpDir); err != nil {
-		return nil, &SourceError{Source: resolved.Name, Operation: "fetch", Err: err, Hint: "check repo access and commit SHA"}
+	if cloneErr := gitCloneAtCommit(ctx, resolved.Repo, resolved.Commit, tmpDir); cloneErr != nil {
+		return nil, &SourceError{Source: resolved.Name, Operation: "fetch", Err: cloneErr, Hint: "check repo access and commit SHA"}
 	}
 
 	var fetched []FetchedFile
@@ -135,7 +135,7 @@ func (g *GitResolver) Fetch(ctx context.Context, resolved *ResolvedSource) ([]Fe
 			return nil, &SourceError{
 				Source:    resolved.Name,
 				Operation: "fetch",
-				Err:      fmt.Errorf("hash mismatch for %s: expected %s, got %s", relPath, expectedHash, actualHash),
+				Err:       fmt.Errorf("hash mismatch for %s: expected %s, got %s", relPath, expectedHash, actualHash),
 			}
 		}
 

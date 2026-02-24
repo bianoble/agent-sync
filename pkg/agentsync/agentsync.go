@@ -76,8 +76,8 @@ type Pruner interface {
 
 // UpdateOptions configures an update operation.
 type UpdateOptions struct {
-	DryRun      bool
 	SourceNames []string // empty = update all
+	DryRun      bool
 }
 
 // UpdateResult holds the outcome of an update operation.
@@ -117,11 +117,11 @@ type Options struct {
 // Client is the main entry point for the agent-sync library.
 // It implements Syncer, Checker, Verifier, Pruner, and Updater.
 type Client struct {
+	registry     *source.Registry
+	cache        *cache.Cache
 	projectRoot  string
 	configPath   string
 	lockfilePath string
-	registry     *source.Registry
-	cache        *cache.Cache
 }
 
 // New creates a new agent-sync Client.
@@ -301,9 +301,7 @@ func (c *Client) Update(ctx context.Context, opts UpdateOptions) (*UpdateResult,
 		}
 		out.Updated = append(out.Updated, su)
 	}
-	for _, e := range result.Failed {
-		out.Failed = append(out.Failed, e)
-	}
+	out.Failed = append(out.Failed, result.Failed...)
 
 	// Save lockfile if not dry-run.
 	if !opts.DryRun && result.Lockfile != nil {

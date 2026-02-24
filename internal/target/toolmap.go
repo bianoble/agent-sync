@@ -8,12 +8,12 @@ import (
 
 // builtinTools defines the default tool path mappings per spec Section 3.2.
 var builtinTools = map[string]string{
-	"cursor":     ".cursor/rules/",
+	"cursor":      ".cursor/rules/",
 	"claude-code": ".claude/",
-	"copilot":    ".github/copilot/",
-	"windsurf":   ".windsurf/rules/",
-	"cline":      ".cline/rules/",
-	"codex":      ".codex/",
+	"copilot":     ".github/copilot/",
+	"windsurf":    ".windsurf/rules/",
+	"cline":       ".cline/rules/",
+	"codex":       ".codex/",
 }
 
 // ToolMap resolves tool names to destination paths.

@@ -19,23 +19,23 @@ type UpdateEngine struct {
 
 // UpdateOptions configures an update operation.
 type UpdateOptions struct {
+	SourceNames []string // empty = update all
 	DryRun      bool
 	AutoConfirm bool
-	SourceNames []string // empty = update all
 }
 
 // SourceUpdate records what changed for a single source.
 type SourceUpdate struct {
-	Name   string
 	Before *lock.LockedSource
 	After  *lock.LockedSource
+	Name   string
 }
 
 // UpdateResult holds the outcome of an update operation.
 type UpdateResult struct {
+	Lockfile *lock.Lockfile // nil if dry-run
 	Updated  []SourceUpdate
 	Failed   []SourceError
-	Lockfile *lock.Lockfile // nil if dry-run
 }
 
 // Update resolves sources and updates the lockfile.
