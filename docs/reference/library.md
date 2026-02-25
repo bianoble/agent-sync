@@ -62,12 +62,17 @@ func main() {
 
 ```go
 type Options struct {
-    ProjectRoot  string // Directory containing agent-sync.yaml
-    ConfigPath   string // Default: "agent-sync.yaml"
-    LockfilePath string // Default: "agent-sync.lock"
-    CacheDir     string // Default: ~/.cache/agent-sync
+    ProjectRoot      string // Directory containing agent-sync.yaml
+    ConfigPath       string // Default: "agent-sync.yaml"
+    LockfilePath     string // Default: "agent-sync.lock"
+    CacheDir         string // Default: ~/.cache/agent-sync
+    SystemConfigPath string // Override system config path (default: OS-specific)
+    UserConfigPath   string // Override user config path (default: OS-specific)
+    NoInherit        bool   // Disable hierarchical config resolution
 }
 ```
+
+By default, `Client` uses [hierarchical config resolution](config.md#configuration-discovery) to merge system, user, and project configs. Set `NoInherit: true` to use only the project config (recommended for CI and testing).
 
 ## Interfaces
 
@@ -132,6 +137,7 @@ type CheckResult struct {
     Clean   bool         // True if all files match
     Drifted []DriftEntry // Files that have changed
     Missing []string     // Files that are missing
+    Errors  []error      // Non-fatal read errors (e.g., permission denied)
 }
 ```
 

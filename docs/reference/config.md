@@ -36,6 +36,34 @@ tool_definitions:
     destination: .tool/path/
 ```
 
+## Configuration Discovery
+
+agent-sync supports **hierarchical configuration** across three levels, merged lowest-precedence first:
+
+| Level | macOS | Linux | Windows |
+|-------|-------|-------|---------|
+| **System** | `/etc/agent-sync/agent-sync.yaml` | `/etc/agent-sync/agent-sync.yaml` | `%ProgramData%\agent-sync\agent-sync.yaml` |
+| **User** | `~/Library/Application Support/agent-sync/agent-sync.yaml` | `$XDG_CONFIG_HOME/agent-sync/agent-sync.yaml` | `%AppData%\agent-sync\agent-sync.yaml` |
+| **Project** | `./agent-sync.yaml` | `./agent-sync.yaml` | `.\agent-sync.yaml` |
+
+### Merge Semantics
+
+| Field | Strategy |
+|-------|----------|
+| `version` | Must agree across all layers |
+| `variables` | Deep merge (higher-precedence key wins) |
+| `sources` | Merge by `name` (project replaces system/user entry with same name) |
+| `tool_definitions` | Merge by `name` |
+| `targets` | Concatenate (system first, then user, then project) |
+| `overrides` | Concatenate |
+| `transforms` | Concatenate |
+
+Use `--no-inherit` or `AGENT_SYNC_NO_INHERIT=1` to disable hierarchical resolution (recommended for CI).
+
+See the [Enterprise Configuration](../guides/enterprise-config.md) guide for deployment patterns, compliance, and advanced examples.
+
+---
+
 ## Sources
 
 ### Git Source
