@@ -1,5 +1,27 @@
 # Installation
 
+## Quick Install (macOS / Linux)
+
+```bash
+curl -sSL https://raw.githubusercontent.com/bianoble/agent-sync/main/install.sh | sh
+```
+
+This auto-detects your OS and architecture, downloads the latest release, verifies the SHA256 checksum, and installs to `/usr/local/bin` (or `~/.local/bin` if not writable).
+
+To install a specific version:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/bianoble/agent-sync/main/install.sh | VERSION=v0.1.0 sh
+```
+
+## Quick Install (Windows)
+
+```powershell
+irm https://raw.githubusercontent.com/bianoble/agent-sync/main/install.ps1 | iex
+```
+
+Downloads the latest release, verifies the SHA256 checksum, installs to `%LOCALAPPDATA%\agent-sync\bin`, and adds it to your PATH.
+
 ## Pre-built Binaries
 
 Download the latest release from [GitHub Releases](https://github.com/bianoble/agent-sync/releases).

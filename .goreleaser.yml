@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+version: 2
+
+project_name: agent-sync
+
+builds:
+  - main: ./cmd/agent-sync
+    binary: agent-sync
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w
+      - -X github.com/bianoble/agent-sync/cmd/agent-sync/cmd.version={{.Version}}
+      - -X github.com/bianoble/agent-sync/cmd/agent-sync/cmd.commit={{.ShortCommit}}
+      - -X github.com/bianoble/agent-sync/cmd/agent-sync/cmd.date={{.Date}}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
+      - Merge pull request
+      - Merge branch
+
+# Homebrew tap — uncomment when bianoble/homebrew-agent-sync repo is created
+# and a HOMEBREW_TAP_TOKEN secret is added to the repository.
+#
+# brews:
+#   - repository:
+#       owner: bianoble
+#       name: homebrew-agent-sync
+#       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+#     homepage: https://github.com/bianoble/agent-sync
+#     description: Deterministic synchronization of agent files
+#     license: MIT
+#     install: |
+#       bin.install "agent-sync"
+#     test: |
+#       system "#{bin}/agent-sync", "version"
