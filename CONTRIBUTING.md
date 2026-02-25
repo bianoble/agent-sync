@@ -62,20 +62,7 @@ make lint && make test && make vet
 
 ## Project Structure
 
-```
-cmd/agent-sync/          CLI entrypoint and Cobra commands
-internal/
-  cache/                 Content-addressed file cache (SHA256)
-  config/                YAML config loading, hierarchical discovery, merge
-  engine/                Core operations: sync, update, check, verify, status, prune
-  lock/                  Lockfile read/write/validate
-  sandbox/               Safe-write enforcement (path traversal, symlink prevention)
-  source/                Source resolvers (git, url, local) and filesystem abstractions
-  target/                Tool map resolution and target path computation
-  transform/             Template and override transforms
-pkg/agentsync/           Public Go library API
-docs/                    MkDocs documentation site
-```
+See [CLAUDE.md](CLAUDE.md#project-structure) for the full project structure, architectural decisions, and coding conventions.
 
 ## Questions?
 
