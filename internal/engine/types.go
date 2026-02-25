@@ -45,6 +45,7 @@ type SyncResult struct {
 type CheckResult struct {
 	Drifted []DriftEntry
 	Missing []string
+	Errors  []error
 	Clean   bool
 }
 

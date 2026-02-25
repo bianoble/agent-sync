@@ -29,7 +29,9 @@ package agentsync
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/bianoble/agent-sync/internal/cache"
@@ -198,8 +200,11 @@ func (c *Client) loadConfig() (*config.Config, error) {
 
 func (c *Client) loadLockfile() (*lock.Lockfile, error) {
 	lf, err := lock.Load(c.lockfilePath)
+	if errors.Is(err, os.ErrNotExist) {
+		return &lock.Lockfile{Version: 1}, nil
+	}
 	if err != nil {
-		return &lock.Lockfile{Version: 1}, nil //nolint: nilerr
+		return nil, fmt.Errorf("loading lockfile: %w", err)
 	}
 	return lf, nil
 }

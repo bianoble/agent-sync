@@ -1,6 +1,7 @@
 package transform
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -18,7 +19,7 @@ type OverrideProcessor struct {
 func (o *OverrideProcessor) ValidateOverrides(overrides []config.Override) error {
 	for _, ov := range overrides {
 		absPath := filepath.Join(o.ProjectRoot, ov.File)
-		if _, err := os.Stat(absPath); os.IsNotExist(err) {
+		if _, err := os.Stat(absPath); errors.Is(err, os.ErrNotExist) {
 			return fmt.Errorf("override for '%s': file '%s' does not exist — create it or remove the override", ov.Target, ov.File)
 		} else if err != nil {
 			return fmt.Errorf("override for '%s': checking file '%s': %w", ov.Target, ov.File, err)
