@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -49,10 +51,12 @@ func (e *CheckEngine) Check(ctx context.Context, lf lock.Lockfile, cfg config.Co
 
 				content, readErr := os.ReadFile(absPath)
 				if readErr != nil {
-					if os.IsNotExist(readErr) {
+					if errors.Is(readErr, os.ErrNotExist) {
 						result.Missing = append(result.Missing, destPath)
-						result.Clean = false
+					} else {
+						result.Errors = append(result.Errors, fmt.Errorf("reading %s: %w", destPath, readErr))
 					}
+					result.Clean = false
 					continue
 				}
 
