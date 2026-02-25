@@ -41,15 +41,15 @@ sources:
 	if err == nil {
 		t.Fatal("expected validation error")
 	}
-	var verr *ValidationError
 	if !strings.Contains(err.Error(), "unsupported version") {
-		// Check if it's a ValidationError.
-		t.Logf("error: %v", err)
-		_ = verr
+		t.Errorf("expected 'unsupported version' in error, got: %v", err)
 	}
 }
 
 func TestSaveToReadOnlyDir(t *testing.T) {
+	if os.Getuid() == 0 {
+		t.Skip("test unreliable as root")
+	}
 	dir := t.TempDir()
 	readOnly := filepath.Join(dir, "readonly")
 	if err := os.MkdirAll(readOnly, 0555); err != nil {

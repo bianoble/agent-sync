@@ -139,8 +139,7 @@ func TestOSFSWalk(t *testing.T) {
 	}
 }
 
-func TestDefaultHTTPClientDo(t *testing.T) {
-	// Just verify it doesn't panic and returns the expected type.
-	client := DefaultHTTPClient{}
-	_ = client // Ensure it compiles and the type is usable.
+func TestDefaultHTTPClientImplementsInterface(t *testing.T) {
+	// Verify DefaultHTTPClient satisfies the HTTPClient interface at compile time.
+	var _ HTTPClient = DefaultHTTPClient{}
 }

@@ -49,6 +49,10 @@ func TestGetReadError(t *testing.T) {
 }
 
 func TestNewCreatesDirError(t *testing.T) {
+	if os.Getuid() == 0 {
+		t.Skip("test unreliable as root")
+	}
+
 	// Try to create cache in a read-only directory.
 	dir := t.TempDir()
 	readOnly := filepath.Join(dir, "readonly")
@@ -95,16 +99,7 @@ func TestComputeHashPublic(t *testing.T) {
 }
 
 func TestDefaultDirWithoutXDG(t *testing.T) {
-	original := os.Getenv("XDG_CACHE_HOME")
-	defer func() {
-		if original != "" {
-			_ = os.Setenv("XDG_CACHE_HOME", original)
-		} else {
-			_ = os.Unsetenv("XDG_CACHE_HOME")
-		}
-	}()
-
-	_ = os.Unsetenv("XDG_CACHE_HOME")
+	t.Setenv("XDG_CACHE_HOME", "")
 	got := DefaultDir()
 	// Should fall back to ~/.cache/agent-sync or temp dir.
 	if got == "" {

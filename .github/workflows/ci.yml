@@ -38,9 +38,13 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           THRESHOLD=80
-          TOTAL=$(go tool cover -func=coverage.out | grep '^total:' | awk '{print $NF}' | sed 's/%//')
+          TOTAL=$(go tool cover -func=coverage.out | awk '/^total:/ {gsub(/%/, "", $NF); print $NF}')
+          if [ -z "$TOTAL" ]; then
+            echo "::error::Could not parse coverage from coverage.out"
+            exit 1
+          fi
           echo "Total coverage: ${TOTAL}%"
-          if [ "$(echo "${TOTAL} < ${THRESHOLD}" | bc)" -eq 1 ]; then
+          if awk "BEGIN {exit !(${TOTAL} < ${THRESHOLD})}"; then
             echo "::error::Coverage ${TOTAL}% is below the ${THRESHOLD}% threshold"
             exit 1
           fi
