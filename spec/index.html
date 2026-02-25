@@ -1,0 +1,1769 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Deterministic synchronization of agent files">
+      
+      
+      
+        <link rel="canonical" href="https://bianoble.github.io/agent-sync/spec/">
+      
+      
+        <link rel="prev" href="../reference/library/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>Specification - agent-sync</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#agent-sync-specification-v04" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="agent-sync" class="md-header__button md-logo" aria-label="agent-sync" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            agent-sync
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Specification
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/bianoble/agent-sync" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    bianoble/agent-sync
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="agent-sync" class="md-nav__button md-logo" aria-label="agent-sync" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    agent-sync
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/bianoble/agent-sync" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    bianoble/agent-sync
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    agent-sync.yaml
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/lockfile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lockfile
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/toolmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tool Map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/transforms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transforms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/enterprise-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enterprise & DevSecOps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/library/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Go Library
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="agent-sync-specification-v04">agent-sync Specification v0.4<a class="headerlink" href="#agent-sync-specification-v04" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>This is the authoritative specification. The file <code>agent-sync-spec-v0.4.md</code> was a historical duplicate and has been removed.</p>
+</blockquote>
+<p><strong>Status:</strong> Draft
+<strong>Audience:</strong> Library implementers, CLI authors, and platform integrators
+<strong>Scope:</strong> Deterministic synchronization of agent-related files from external sources into a project workspace.
+<strong>Non-Goals:</strong> Agent execution, registry hosting, agent runtime orchestration.</p>
+<hr />
+<h1 id="1-overview">1. Overview<a class="headerlink" href="#1-overview" title="Permanent link">&para;</a></h1>
+<h2 id="11-purpose">1.1 Purpose<a class="headerlink" href="#11-purpose" title="Permanent link">&para;</a></h2>
+<p><code>agent-sync</code> is a <strong>deterministic, registry-agnostic dependency and synchronization system for agent files</strong>.</p>
+<p>It enables projects to:</p>
+<ul>
+<li>Fetch agent files from external sources (Git, URL, local)</li>
+<li>Pin those files immutably</li>
+<li>Apply controlled transformations and overlays</li>
+<li>Safely synchronize them into tool-specific or project-specific locations</li>
+</ul>
+<p>Core principle:</p>
+<blockquote>
+<p>agent-sync manages <strong>files as immutable inputs and deterministic outputs</strong></p>
+</blockquote>
+<p>It does not interpret agent semantics.</p>
+<hr />
+<h2 id="12-design-goals">1.2 Design Goals<a class="headerlink" href="#12-design-goals" title="Permanent link">&para;</a></h2>
+<h3 id="primary-goals">Primary Goals<a class="headerlink" href="#primary-goals" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Deterministic</li>
+<li>Secure by default</li>
+<li>Registry-agnostic</li>
+<li>Tool-agnostic</li>
+<li>Minimal and composable</li>
+<li>Embeddable as a Go library</li>
+</ul>
+<h3 id="secondary-goals">Secondary Goals<a class="headerlink" href="#secondary-goals" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Human-readable configuration</li>
+<li>Explicit updates only</li>
+<li>CI-friendly drift detection</li>
+</ul>
+<hr />
+<h2 id="13-non-goals">1.3 Non-Goals<a class="headerlink" href="#13-non-goals" title="Permanent link">&para;</a></h2>
+<p>agent-sync does NOT:</p>
+<ul>
+<li>Execute agents</li>
+<li>Interpret agent behavior</li>
+<li>Provide a registry (deferred)</li>
+<li>Replace configuration management tools</li>
+<li>Replace package managers</li>
+</ul>
+<hr />
+<h1 id="2-conceptual-model">2. Conceptual Model<a class="headerlink" href="#2-conceptual-model" title="Permanent link">&para;</a></h1>
+<p>agent-sync operates on four layers:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Sources → Locked Inputs → Transform → Target Files
+</code></pre></div>
+<hr />
+<h2 id="21-sources">2.1 Sources<a class="headerlink" href="#21-sources" title="Permanent link">&para;</a></h2>
+<p>Sources provide files.</p>
+<p>Supported source types:</p>
+<ul>
+<li>git</li>
+<li>url</li>
+<li>local</li>
+</ul>
+<p>Each source is resolved into an immutable artifact.</p>
+<hr />
+<h2 id="22-lockfile">2.2 Lockfile<a class="headerlink" href="#22-lockfile" title="Permanent link">&para;</a></h2>
+<p>The lockfile records the <strong>fully resolved, immutable state</strong> of all inputs.</p>
+<p>The lockfile guarantees:</p>
+<ul>
+<li>Reproducible sync</li>
+<li>Supply chain integrity</li>
+<li>Drift detection</li>
+</ul>
+<hr />
+<h2 id="23-transform">2.3 Transform<a class="headerlink" href="#23-transform" title="Permanent link">&para;</a></h2>
+<p>Optional transforms include:</p>
+<ul>
+<li>Template variable substitution</li>
+<li>Overlay merging</li>
+<li>File mapping</li>
+<li>Custom transform hooks</li>
+</ul>
+<p>Transforms MUST be deterministic.</p>
+<hr />
+<h2 id="24-targets">2.4 Targets<a class="headerlink" href="#24-targets" title="Permanent link">&para;</a></h2>
+<p>Targets define where files are written.</p>
+<p>Targets MUST remain inside the project root sandbox.</p>
+<p>Targets may be specified explicitly or derived from the tool map (see Section 3.2).</p>
+<hr />
+<h1 id="3-configuration-file">3. Configuration File<a class="headerlink" href="#3-configuration-file" title="Permanent link">&para;</a></h1>
+<p>File name:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>agent-sync.yaml
+</code></pre></div>
+<hr />
+<h2 id="31-example">3.1 Example<a class="headerlink" href="#31-example" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nt">variables</span><span class="p">:</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">project</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-project</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">go</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nt">sources</span><span class="p">:</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base-rules</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">git</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/org/rules.git</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.2.0</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="nt">paths</span><span class="p">:</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">core/</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">security-policy</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">url</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://example.com/policy.md</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">    </span><span class="nt">checksum</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sha256:abcdef...</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-standards</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./agents/standards/</span>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="nt">targets</span><span class="p">:</span>
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base-rules</span>
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="w">    </span><span class="nt">tools</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">cursor</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">claude-code</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">copilot</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>
+<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">security-policy</span>
+<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="w">    </span><span class="nt">tools</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">cursor</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">claude-code</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>
+<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-standards</span>
+<a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="w">    </span><span class="nt">destination</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.custom/agents/</span>
+<a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a>
+<a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="nt">overrides</span><span class="p">:</span>
+<a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a>
+<a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">security.md</span>
+<a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a><span class="w">    </span><span class="nt">strategy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">append</span>
+<a id="__codelineno-2-40" name="__codelineno-2-40" href="#__codelineno-2-40"></a><span class="w">    </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local/security-extension.md</span>
+<a id="__codelineno-2-41" name="__codelineno-2-41" href="#__codelineno-2-41"></a>
+<a id="__codelineno-2-42" name="__codelineno-2-42" href="#__codelineno-2-42"></a><span class="nt">transforms</span><span class="p">:</span>
+<a id="__codelineno-2-43" name="__codelineno-2-43" href="#__codelineno-2-43"></a>
+<a id="__codelineno-2-44" name="__codelineno-2-44" href="#__codelineno-2-44"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base-rules</span>
+<a id="__codelineno-2-45" name="__codelineno-2-45" href="#__codelineno-2-45"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">template</span>
+<a id="__codelineno-2-46" name="__codelineno-2-46" href="#__codelineno-2-46"></a><span class="w">    </span><span class="nt">vars</span><span class="p">:</span>
+<a id="__codelineno-2-47" name="__codelineno-2-47" href="#__codelineno-2-47"></a><span class="w">      </span><span class="nt">project</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">.project</span><span class="nv"> </span><span class="s">}}&quot;</span>
+<a id="__codelineno-2-48" name="__codelineno-2-48" href="#__codelineno-2-48"></a>
+<a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-standards</span>
+<a id="__codelineno-2-50" name="__codelineno-2-50" href="#__codelineno-2-50"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">custom</span>
+<a id="__codelineno-2-51" name="__codelineno-2-51" href="#__codelineno-2-51"></a><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./scripts/merge-yaml.sh&quot;</span>
+<a id="__codelineno-2-52" name="__codelineno-2-52" href="#__codelineno-2-52"></a><span class="w">    </span><span class="nt">output_hash</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sha256:expected...</span>
+</code></pre></div>
+<hr />
+<h2 id="32-tool-map">3.2 Tool Map<a class="headerlink" href="#32-tool-map" title="Permanent link">&para;</a></h2>
+<p>The tool map provides automatic path resolution for known agent tools.</p>
+<h3 id="built-in-tool-definitions">Built-in Tool Definitions<a class="headerlink" href="#built-in-tool-definitions" title="Permanent link">&para;</a></h3>
+<p>agent-sync ships with built-in path mappings for known tools:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Default Destination</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cursor</td>
+<td>.cursor/rules/</td>
+</tr>
+<tr>
+<td>claude-code</td>
+<td>.claude/</td>
+</tr>
+<tr>
+<td>copilot</td>
+<td>.github/copilot/</td>
+</tr>
+<tr>
+<td>windsurf</td>
+<td>.windsurf/rules/</td>
+</tr>
+<tr>
+<td>cline</td>
+<td>.cline/rules/</td>
+</tr>
+<tr>
+<td>codex</td>
+<td>.codex/</td>
+</tr>
+</tbody>
+</table>
+<h3 id="custom-tool-definitions">Custom Tool Definitions<a class="headerlink" href="#custom-tool-definitions" title="Permanent link">&para;</a></h3>
+<p>Teams may define custom tools or override built-in paths:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">tool_definitions</span><span class="p">:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">internal-agent</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="nt">destination</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.internal/agent-config/</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cursor</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="nt">destination</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.cursor/custom-rules/</span>
+</code></pre></div>
+<h3 id="tool-map-resolution-rules">Tool Map Resolution Rules<a class="headerlink" href="#tool-map-resolution-rules" title="Permanent link">&para;</a></h3>
+<ol>
+<li>If a target specifies <code>tools:</code>, agent-sync resolves each tool name to its destination path.</li>
+<li>Custom <code>tool_definitions</code> override built-in mappings.</li>
+<li>If a tool name has no built-in or custom definition, agent-sync MUST error with a clear message indicating the unknown tool and how to define it.</li>
+<li>If a target specifies <code>destination:</code> directly, no tool map resolution occurs — the path is used as-is.</li>
+<li><code>tools:</code> and <code>destination:</code> are mutually exclusive on a single target entry.</li>
+</ol>
+<hr />
+<h2 id="33-hierarchical-configuration">3.3 Hierarchical Configuration<a class="headerlink" href="#33-hierarchical-configuration" title="Permanent link">&para;</a></h2>
+<p>agent-sync supports three-level hierarchical configuration: <strong>system</strong>, <strong>user</strong>, and <strong>project</strong>. Configs are discovered automatically and merged in order of increasing precedence.</p>
+<h3 id="discovery-paths">Discovery Paths<a class="headerlink" href="#discovery-paths" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>macOS</th>
+<th>Linux</th>
+<th>Windows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>System</td>
+<td><code>/etc/agent-sync/agent-sync.yaml</code></td>
+<td><code>/etc/agent-sync/agent-sync.yaml</code></td>
+<td><code>%ProgramData%\agent-sync\agent-sync.yaml</code></td>
+</tr>
+<tr>
+<td>User</td>
+<td><code>~/Library/Application Support/agent-sync/agent-sync.yaml</code></td>
+<td><code>$XDG_CONFIG_HOME/agent-sync/agent-sync.yaml</code></td>
+<td><code>%AppData%\agent-sync\agent-sync.yaml</code></td>
+</tr>
+<tr>
+<td>Project</td>
+<td><code>./agent-sync.yaml</code></td>
+<td><code>./agent-sync.yaml</code></td>
+<td><code>.\agent-sync.yaml</code></td>
+</tr>
+</tbody>
+</table>
+<p>Missing config files at any level are silently skipped.</p>
+<h3 id="merge-semantics">Merge Semantics<a class="headerlink" href="#merge-semantics" title="Permanent link">&para;</a></h3>
+<p>When multiple config levels are present, they are merged as follows:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Strategy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>version</code></td>
+<td>MUST agree across all layers. Mismatch is a fatal error.</td>
+</tr>
+<tr>
+<td><code>variables</code></td>
+<td>Deep merge. Higher-precedence keys overwrite lower. Unique keys are preserved.</td>
+</tr>
+<tr>
+<td><code>sources</code></td>
+<td>Merge by <code>name</code>. A source in a higher-precedence layer fully replaces a source with the same name from a lower layer.</td>
+</tr>
+<tr>
+<td><code>tool_definitions</code></td>
+<td>Merge by <code>name</code>. Same replacement semantics as sources.</td>
+</tr>
+<tr>
+<td><code>targets</code></td>
+<td>Concatenate. System targets first, then user, then project.</td>
+</tr>
+<tr>
+<td><code>overrides</code></td>
+<td>Concatenate. Applied in order: system, user, project.</td>
+</tr>
+<tr>
+<td><code>transforms</code></td>
+<td>Concatenate. Applied in order: system, user, project.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="disabling-hierarchical-resolution">Disabling Hierarchical Resolution<a class="headerlink" href="#disabling-hierarchical-resolution" title="Permanent link">&para;</a></h3>
+<p>The <code>--no-inherit</code> CLI flag or <code>AGENT_SYNC_NO_INHERIT=1</code> environment variable disables hierarchical resolution. When set, only the project-level config is used. This is RECOMMENDED for CI/CD environments to ensure reproducible builds.</p>
+<h3 id="environment-variable-overrides">Environment Variable Overrides<a class="headerlink" href="#environment-variable-overrides" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AGENT_SYNC_SYSTEM_CONFIG</code></td>
+<td>Override the system config file path</td>
+</tr>
+<tr>
+<td><code>AGENT_SYNC_USER_CONFIG</code></td>
+<td>Override the user config file path</td>
+</tr>
+<tr>
+<td><code>AGENT_SYNC_NO_INHERIT</code></td>
+<td>Set to <code>1</code> or <code>true</code> to disable hierarchical resolution</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="4-lockfile-specification">4. Lockfile Specification<a class="headerlink" href="#4-lockfile-specification" title="Permanent link">&para;</a></h1>
+<p>File:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>agent-sync.lock
+</code></pre></div>
+<hr />
+<h2 id="41-purpose">4.1 Purpose<a class="headerlink" href="#41-purpose" title="Permanent link">&para;</a></h2>
+<p>The lockfile records:</p>
+<ul>
+<li>Fully resolved source identity</li>
+<li>Content hashes</li>
+<li>Transform output hashes</li>
+<li>Sync status per source</li>
+</ul>
+<p>The lockfile is the authoritative record.</p>
+<hr />
+<h2 id="42-example">4.2 Example<a class="headerlink" href="#42-example" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nt">sources</span><span class="p">:</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">base-rules</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">git</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/org/rules.git</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="nt">resolved</span><span class="p">:</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">      </span><span class="nt">commit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3f8c9abf...</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">      </span><span class="nt">tree</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">a8bcdef...</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">      </span><span class="nt">files</span><span class="p">:</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">        </span><span class="nt">core/security.md</span><span class="p">:</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">          </span><span class="nt">sha256</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">123abc...</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">        </span><span class="nt">core/general.md</span><span class="p">:</span>
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="w">          </span><span class="nt">sha256</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">456def...</span>
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>
+<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="w">    </span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ok</span>
+<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>
+<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">security-policy</span>
+<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">url</span>
+<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>
+<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a><span class="w">    </span><span class="nt">resolved</span><span class="p">:</span>
+<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>
+<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="w">      </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://example.com/policy.md</span>
+<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a><span class="w">      </span><span class="nt">sha256</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">abcdef123...</span>
+<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a>
+<a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a><span class="w">    </span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ok</span>
+<a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a>
+<a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-standards</span>
+<a id="__codelineno-5-35" name="__codelineno-5-35" href="#__codelineno-5-35"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
+<a id="__codelineno-5-36" name="__codelineno-5-36" href="#__codelineno-5-36"></a>
+<a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a><span class="w">    </span><span class="nt">resolved</span><span class="p">:</span>
+<a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a>
+<a id="__codelineno-5-39" name="__codelineno-5-39" href="#__codelineno-5-39"></a><span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./agents/standards/</span>
+<a id="__codelineno-5-40" name="__codelineno-5-40" href="#__codelineno-5-40"></a>
+<a id="__codelineno-5-41" name="__codelineno-5-41" href="#__codelineno-5-41"></a><span class="w">      </span><span class="nt">files</span><span class="p">:</span>
+<a id="__codelineno-5-42" name="__codelineno-5-42" href="#__codelineno-5-42"></a>
+<a id="__codelineno-5-43" name="__codelineno-5-43" href="#__codelineno-5-43"></a><span class="w">        </span><span class="nt">standards/naming.md</span><span class="p">:</span>
+<a id="__codelineno-5-44" name="__codelineno-5-44" href="#__codelineno-5-44"></a><span class="w">          </span><span class="nt">sha256</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">789ghi...</span>
+<a id="__codelineno-5-45" name="__codelineno-5-45" href="#__codelineno-5-45"></a>
+<a id="__codelineno-5-46" name="__codelineno-5-46" href="#__codelineno-5-46"></a><span class="w">        </span><span class="nt">standards/testing.md</span><span class="p">:</span>
+<a id="__codelineno-5-47" name="__codelineno-5-47" href="#__codelineno-5-47"></a><span class="w">          </span><span class="nt">sha256</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">012jkl...</span>
+<a id="__codelineno-5-48" name="__codelineno-5-48" href="#__codelineno-5-48"></a>
+<a id="__codelineno-5-49" name="__codelineno-5-49" href="#__codelineno-5-49"></a><span class="w">    </span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ok</span>
+</code></pre></div>
+<hr />
+<h2 id="43-lockfile-guarantees">4.3 Lockfile Guarantees<a class="headerlink" href="#43-lockfile-guarantees" title="Permanent link">&para;</a></h2>
+<p>Given the same lockfile, agent-sync MUST produce:</p>
+<ul>
+<li>Same inputs</li>
+<li>Same outputs</li>
+<li>Same file contents</li>
+</ul>
+<p>Byte-for-byte reproducibility is the standard.</p>
+<hr />
+<h2 id="44-partial-update-behavior">4.4 Partial Update Behavior<a class="headerlink" href="#44-partial-update-behavior" title="Permanent link">&para;</a></h2>
+<p>See Section 9.2 for the authoritative definition of partial update behavior. The lockfile supports partial updates: individual source entries may be updated independently while others remain unchanged.</p>
+<hr />
+<h1 id="5-source-types">5. Source Types<a class="headerlink" href="#5-source-types" title="Permanent link">&para;</a></h1>
+<hr />
+<h2 id="51-git-source">5.1 Git Source<a class="headerlink" href="#51-git-source" title="Permanent link">&para;</a></h2>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">git</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/org/repo.git</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nt">ref</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.2.0</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="nt">paths</span><span class="p">:</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">folder/</span>
+</code></pre></div>
+<hr />
+<h3 id="resolution-rules">Resolution Rules<a class="headerlink" href="#resolution-rules" title="Permanent link">&para;</a></h3>
+<p>agent-sync MUST resolve and record:</p>
+<ul>
+<li>commit SHA</li>
+<li>tree SHA</li>
+<li>per-file content hashes</li>
+</ul>
+<p><code>ref</code> is a human hint only.</p>
+<p>The resolved commit SHA is authoritative.</p>
+<hr />
+<h3 id="optional-security-modes-recommended">Optional Security Modes (Recommended)<a class="headerlink" href="#optional-security-modes-recommended" title="Permanent link">&para;</a></h3>
+<p>Implementations SHOULD support:</p>
+<ul>
+<li>signed tag verification</li>
+<li>signed commit verification</li>
+<li>repository allowlists</li>
+</ul>
+<hr />
+<h2 id="52-url-source">5.2 URL Source<a class="headerlink" href="#52-url-source" title="Permanent link">&para;</a></h2>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">url</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://example.com/file.md</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nt">checksum</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sha256:abcdef</span>
+</code></pre></div>
+<p><code>checksum</code> is REQUIRED.</p>
+<p>agent-sync MUST verify the fetched content against the declared checksum before accepting it.</p>
+<hr />
+<h2 id="53-local-source">5.3 Local Source<a class="headerlink" href="#53-local-source" title="Permanent link">&para;</a></h2>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./agents/</span>
+</code></pre></div>
+<h3 id="path-resolution">Path Resolution<a class="headerlink" href="#path-resolution" title="Permanent link">&para;</a></h3>
+<p>Local source <code>path</code> is resolved relative to the project root (the directory containing <code>agent-sync.yaml</code>).</p>
+<h3 id="locking-requirements">Locking Requirements<a class="headerlink" href="#locking-requirements" title="Permanent link">&para;</a></h3>
+<p>Local sources MUST be locked by hashing all resolved files.</p>
+<p>The lockfile MUST record per-file content hashes for local sources, identical in structure to git and url sources.</p>
+<p>Rationale: local sources that are not hashed break the determinism guarantee. If the lockfile cannot verify local file integrity, drift detection and reproducibility are compromised.</p>
+<hr />
+<h1 id="6-transform-specification">6. Transform Specification<a class="headerlink" href="#6-transform-specification" title="Permanent link">&para;</a></h1>
+<p>Transforms MUST be deterministic.</p>
+<hr />
+<h2 id="61-template-transform">6.1 Template Transform<a class="headerlink" href="#61-template-transform" title="Permanent link">&para;</a></h2>
+<p>Variables substituted using Go <code>text/template</code>.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Project: {{ .project }}
+</code></pre></div>
+<hr />
+<h3 id="security">Security<a class="headerlink" href="#security" title="Permanent link">&para;</a></h3>
+<p>Template execution:</p>
+<ul>
+<li>No file access</li>
+<li>No network access</li>
+<li>No code execution</li>
+</ul>
+<p>Template input is data only.</p>
+<p>Implementations SHOULD support disabling templates entirely via configuration.</p>
+<hr />
+<h2 id="62-overrides">6.2 Overrides<a class="headerlink" href="#62-overrides" title="Permanent link">&para;</a></h2>
+<p>Overrides modify target files after sync.</p>
+<p>Supported strategies:</p>
+<ul>
+<li><code>append</code> — add content after the synced file</li>
+<li><code>prepend</code> — add content before the synced file</li>
+<li><code>replace</code> — replace the synced file entirely with the override file</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">overrides</span><span class="p">:</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">security.md</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="nt">strategy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">append</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local/security-extension.md</span>
+</code></pre></div>
+<p>Override resolution:</p>
+<ol>
+<li>Overrides are applied after all sources are synced.</li>
+<li>The <code>target</code> field matches against the final destination filename (not source path).</li>
+<li>If the target file does not exist after sync, the override MUST error.</li>
+<li>The <code>file</code> path is resolved relative to the project root (the directory containing <code>agent-sync.yaml</code>).</li>
+<li>The override file itself MUST exist at config validation time — agent-sync MUST error if it is not found.</li>
+</ol>
+<hr />
+<h2 id="63-custom-transform-hooks">6.3 Custom Transform Hooks<a class="headerlink" href="#63-custom-transform-hooks" title="Permanent link">&para;</a></h2>
+<p>For transforms beyond template substitution and overrides, agent-sync supports custom transform hooks.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">transforms</span><span class="p">:</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">team-standards</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">custom</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./scripts/merge-yaml.sh&quot;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="nt">output_hash</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sha256:expected...</span>
+</code></pre></div>
+<h3 id="custom-transform-rules">Custom Transform Rules<a class="headerlink" href="#custom-transform-rules" title="Permanent link">&para;</a></h3>
+<ol>
+<li>The command receives the source files via stdin or a temporary directory (implementation-defined).</li>
+<li>The command MUST produce output to stdout or a temporary output directory (implementation-defined).</li>
+<li><code>output_hash</code> is OPTIONAL. If provided, agent-sync MUST verify the transform output against it. This enables lockfile-level pinning of transform results.</li>
+<li>Custom transforms MUST NOT have network access.</li>
+<li>Custom transforms MUST NOT modify files outside the designated output.</li>
+<li>If the command exits non-zero, the sync MUST fail for that source.</li>
+</ol>
+<h3 id="mvp-scope-note">MVP Scope Note<a class="headerlink" href="#mvp-scope-note" title="Permanent link">&para;</a></h3>
+<p>For initial implementation, custom transforms are OPTIONAL. Template substitution and overrides cover the majority of use cases. Custom transforms provide the extension point for advanced workflows without overcomplicating the core.</p>
+<hr />
+<h2 id="64-conflict-rules">6.4 Conflict Rules<a class="headerlink" href="#64-conflict-rules" title="Permanent link">&para;</a></h2>
+<p>Multiple sources targeting the same destination file MUST error unless:</p>
+<ul>
+<li>An explicit override is configured for that file, OR</li>
+<li>The target entries are for different tools (and thus resolve to different paths)</li>
+</ul>
+<hr />
+<h1 id="7-target-specification">7. Target Specification<a class="headerlink" href="#7-target-specification" title="Permanent link">&para;</a></h1>
+<p>Targets define output locations.</p>
+<hr />
+<h2 id="71-tool-based-targets">7.1 Tool-Based Targets<a class="headerlink" href="#71-tool-based-targets" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">targets</span><span class="p">:</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rules</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="nt">tools</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">cursor</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">claude-code</span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<p>Resolves via the tool map (Section 3.2).</p>
+<hr />
+<h2 id="72-explicit-path-targets">7.2 Explicit Path Targets<a class="headerlink" href="#72-explicit-path-targets" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">targets</span><span class="p">:</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rules</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="nt">destination</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.custom/rules/</span>
+</code></pre></div>
+<p>Used for tools without a built-in mapping, or when direct control is needed.</p>
+<hr />
+<h2 id="73-target-rules">7.3 Target Rules<a class="headerlink" href="#73-target-rules" title="Permanent link">&para;</a></h2>
+<ol>
+<li><code>tools</code> and <code>destination</code> are mutually exclusive per target entry.</li>
+<li>All resolved paths MUST be validated against the sandbox (Section 8.1).</li>
+<li>If a source defined in config has no matching target entry, agent-sync MUST warn during <code>sync</code> and <code>check</code>. This is not a fatal error — the source is simply unused.</li>
+</ol>
+<hr />
+<h1 id="8-security-model">8. Security Model<a class="headerlink" href="#8-security-model" title="Permanent link">&para;</a></h1>
+<p>Security is a core design requirement.</p>
+<hr />
+<h2 id="81-sandbox-guarantee">8.1 Sandbox Guarantee<a class="headerlink" href="#81-sandbox-guarantee" title="Permanent link">&para;</a></h2>
+<p>agent-sync MUST prevent writing outside the project root.</p>
+<p>Protection MUST include:</p>
+<ul>
+<li>Absolute path resolution before any write</li>
+<li>Symlink resolution and traversal prevention</li>
+<li>TOCTOU (time-of-check-to-time-of-use) defense via atomic operations</li>
+<li>Rejection of paths containing <code>..</code> after resolution</li>
+</ul>
+<p><code>filepath.Clean</code> alone is NOT sufficient.</p>
+<hr />
+<h2 id="82-safe-write-requirements">8.2 Safe Write Requirements<a class="headerlink" href="#82-safe-write-requirements" title="Permanent link">&para;</a></h2>
+<p>All file writes MUST:</p>
+<ul>
+<li>Use atomic temp file + rename</li>
+<li>Resolve the real path before writing</li>
+<li>Reject symlink escapes</li>
+<li>Verify the final path is within the project root</li>
+</ul>
+<hr />
+<h2 id="83-integrity-verification">8.3 Integrity Verification<a class="headerlink" href="#83-integrity-verification" title="Permanent link">&para;</a></h2>
+<p>agent-sync MUST verify:</p>
+<ul>
+<li>File content hashes against lockfile</li>
+<li>Lockfile internal consistency (no duplicate entries, no orphaned references)</li>
+</ul>
+<p>Verification MUST occur before any file is written to the target.</p>
+<hr />
+<h2 id="84-cache-requirements">8.4 Cache Requirements<a class="headerlink" href="#84-cache-requirements" title="Permanent link">&para;</a></h2>
+<p>Cache MUST be:</p>
+<ul>
+<li>Content-addressed</li>
+<li>Immutable once written</li>
+<li>Verified (hash-checked) before use</li>
+</ul>
+<hr />
+<h2 id="85-resource-limits-recommended">8.5 Resource Limits (Recommended)<a class="headerlink" href="#85-resource-limits-recommended" title="Permanent link">&para;</a></h2>
+<p>Implementations SHOULD support configurable limits:</p>
+<ul>
+<li><code>max_file_size</code> — maximum size of any single fetched file</li>
+<li><code>max_source_size</code> — maximum total size of files from a single source</li>
+<li><code>fetch_timeout</code> — maximum time for any network fetch operation</li>
+</ul>
+<hr />
+<h1 id="9-cli-specification">9. CLI Specification<a class="headerlink" href="#9-cli-specification" title="Permanent link">&para;</a></h1>
+<p>Reference CLI commands. The CLI is optional — all behavior is also available via the Go library (Section 10).</p>
+<hr />
+<h2 id="91-sync">9.1 sync<a class="headerlink" href="#91-sync" title="Permanent link">&para;</a></h2>
+<p>Synchronize files to targets using the lockfile.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>agent-sync sync [--dry-run]
+</code></pre></div>
+<p>Behavior:</p>
+<ul>
+<li>Reads the lockfile as the source of truth.</li>
+<li>Fetches content from cache or sources as needed.</li>
+<li>Writes files to target locations.</li>
+<li>MUST NOT modify the lockfile. (Only <code>update</code> and <code>prune</code> may modify the lockfile.)</li>
+</ul>
+<p><code>--dry-run</code> flag:</p>
+<ul>
+<li>Shows exactly which files would be written, modified, or removed.</li>
+<li>Shows the diff for each changed file.</li>
+<li>Makes no changes to the filesystem.</li>
+<li>Exits with the same code that a real sync would (0 for clean, non-zero for errors).</li>
+</ul>
+<h3 id="sync-failure-and-rollback">Sync Failure and Rollback<a class="headerlink" href="#sync-failure-and-rollback" title="Permanent link">&para;</a></h3>
+<p>If sync fails partway through:</p>
+<ul>
+<li>Files already written in the current operation MUST be rolled back to their previous state.</li>
+<li>The lockfile MUST NOT be modified.</li>
+<li>The CLI MUST report exactly which files were affected and which source caused the failure.</li>
+<li>Exit non-zero.</li>
+</ul>
+<p>Rollback strategy: agent-sync SHOULD snapshot existing target files before beginning a sync operation and restore them on failure.</p>
+<hr />
+<h2 id="92-update">9.2 update<a class="headerlink" href="#92-update" title="Permanent link">&para;</a></h2>
+<p>Resolve sources against their upstream and update the lockfile.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>agent-sync update [source-name...] [--dry-run]
+</code></pre></div>
+<p>Behavior:</p>
+<ul>
+<li>Resolves each source to its current upstream state.</li>
+<li>Shows a diff of lockfile changes before applying.</li>
+<li>Requires interactive confirmation (unless <code>--yes</code> is passed).</li>
+<li>Updates the lockfile with resolved state.</li>
+</ul>
+<p>If <code>source-name</code> arguments are provided, only those sources are updated. Others are left unchanged.</p>
+<h3 id="partial-failure-behavior">Partial Failure Behavior<a class="headerlink" href="#partial-failure-behavior" title="Permanent link">&para;</a></h3>
+<p>When updating multiple sources:</p>
+<ul>
+<li>Successfully resolved sources MUST be written to the lockfile.</li>
+<li>Failed sources MUST retain their previous lockfile entry.</li>
+<li>Each failure MUST be reported with source name and error detail.</li>
+<li>Exit non-zero if any source failed.</li>
+</ul>
+<hr />
+<h2 id="93-check">9.3 check<a class="headerlink" href="#93-check" title="Permanent link">&para;</a></h2>
+<p>Verify that target files match the lockfile.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>agent-sync check
+</code></pre></div>
+<p>Behavior:</p>
+<ul>
+<li>Hashes all target files and compares against the lockfile.</li>
+<li>Reports any drift (files changed, missing, or unexpected).</li>
+<li>Exit 0 if everything matches. Exit non-zero on drift.</li>
+<li>Suitable for CI pipelines.</li>
+</ul>
+<hr />
+<h2 id="94-verify">9.4 verify<a class="headerlink" href="#94-verify" title="Permanent link">&para;</a></h2>
+<p>Verify the lockfile against upstream sources.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>agent-sync verify [source-name...]
+</code></pre></div>
+<p>Behavior:</p>
+<ul>
+<li>For each source, checks whether the upstream has changed since the lockfile was last written.</li>
+<li>Reports which sources have newer content available.</li>
+<li>Does NOT modify the lockfile or target files.</li>
+<li>Exit 0 if all sources match upstream. Exit non-zero if any source has upstream changes.</li>
+</ul>
+<h3 id="use-cases">Use Cases<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h3>
+<ul>
+<li>CI pipeline: "are we up to date with upstream?"</li>
+<li>Security audit: "has the upstream content changed since we pinned it?"</li>
+<li>Pre-update check: "what would change if I ran update?"</li>
+</ul>
+<hr />
+<h2 id="95-status">9.5 status<a class="headerlink" href="#95-status" title="Permanent link">&para;</a></h2>
+<p>Show the current state of all synced agents/sources.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>agent-sync status [source-name...]
+</code></pre></div>
+<p>Output includes:</p>
+<ul>
+<li>Source name and type</li>
+<li>Pinned version / commit (from lockfile)</li>
+<li>Target destinations (resolved tool paths)</li>
+<li>Sync state: <code>synced</code>, <code>drifted</code>, <code>missing</code>, <code>pending</code></li>
+<li>Last sync timestamp (if tracked)</li>
+</ul>
+<p>Example output:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>SOURCE           TYPE   PINNED AT       TARGETS                          STATE
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>base-rules       git    v1.2.0 (3f8c9a) .cursor/rules/, .claude/        synced
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>security-policy  url    sha256:abcdef   .cursor/policy.md, .claude/...   drifted
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>team-standards   local  (5 files)       .custom/agents/                  synced
+</code></pre></div>
+<hr />
+<h2 id="96-info">9.6 info<a class="headerlink" href="#96-info" title="Permanent link">&para;</a></h2>
+<p>Show information about the agent-sync tool itself.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>agent-sync info
+</code></pre></div>
+<p>Output includes:</p>
+<ul>
+<li>agent-sync version</li>
+<li>Spec version supported</li>
+<li>Configuration file location (if found)</li>
+<li>Lockfile location (if found)</li>
+<li>Cache directory location and size</li>
+<li>Known tool definitions (built-in + custom)</li>
+<li>Go library version (if relevant)</li>
+</ul>
+<hr />
+<h2 id="97-prune">9.7 prune<a class="headerlink" href="#97-prune" title="Permanent link">&para;</a></h2>
+<p>Remove previously synced files that are no longer referenced in the configuration.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>agent-sync prune [--dry-run]
+</code></pre></div>
+<p>Behavior:</p>
+<ul>
+<li>Compares current config targets against files tracked in the lockfile.</li>
+<li>Removes files that were previously synced but are no longer in the config.</li>
+<li>Updates the lockfile to remove pruned entries.</li>
+<li><code>--dry-run</code> shows what would be removed without acting.</li>
+</ul>
+<hr />
+<h2 id="98-global-flags">9.8 Global Flags<a class="headerlink" href="#98-global-flags" title="Permanent link">&para;</a></h2>
+<p>The following flags are available on all commands:</p>
+<ul>
+<li><code>--config &lt;path&gt;</code> — path to config file (default: <code>agent-sync.yaml</code>)</li>
+<li><code>--lockfile &lt;path&gt;</code> — path to lockfile (default: <code>agent-sync.lock</code>)</li>
+<li><code>--verbose</code> — detailed output</li>
+<li><code>--quiet</code> — minimal output (errors only)</li>
+<li><code>--no-color</code> — disable colored output</li>
+<li><code>--no-inherit</code> — disable hierarchical config resolution (use only the project config)</li>
+</ul>
+<hr />
+<h2 id="99-environment-variables">9.9 Environment Variables<a class="headerlink" href="#99-environment-variables" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AGENT_SYNC_SYSTEM_CONFIG</code></td>
+<td>Override the system config file path</td>
+</tr>
+<tr>
+<td><code>AGENT_SYNC_USER_CONFIG</code></td>
+<td>Override the user config file path</td>
+</tr>
+<tr>
+<td><code>AGENT_SYNC_NO_INHERIT</code></td>
+<td>Set to <code>1</code> or <code>true</code> to disable hierarchical resolution</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="10-library-specification-go">10. Library Specification (Go)<a class="headerlink" href="#10-library-specification-go" title="Permanent link">&para;</a></h1>
+<p>agent-sync MUST be usable as a Go library.</p>
+<hr />
+<h2 id="101-core-interfaces">10.1 Core Interfaces<a class="headerlink" href="#101-core-interfaces" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Resolver</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">    </span><span class="c1">// Resolve resolves sources and returns an updated lockfile.</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">    </span><span class="c1">// If sourceNames is non-empty, only those sources are resolved.</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">    </span><span class="nx">Resolve</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="nx">Config</span><span class="p">,</span><span class="w"> </span><span class="nx">sourceNames</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nx">Lockfile</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="p">}</span>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Syncer</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">    </span><span class="nx">Sync</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">lock</span><span class="w"> </span><span class="nx">Lockfile</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="nx">Config</span><span class="p">,</span><span class="w"> </span><span class="nx">opts</span><span class="w"> </span><span class="nx">SyncOptions</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">SyncResult</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="p">}</span>
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>
+<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Checker</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a><span class="w">    </span><span class="nx">Check</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">lock</span><span class="w"> </span><span class="nx">Lockfile</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="nx">Config</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">CheckResult</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+<a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a><span class="p">}</span>
+<a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a>
+<a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Verifier</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a><span class="w">    </span><span class="c1">// Verify checks whether upstream sources have changed since lockfile was written.</span>
+<a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a><span class="w">    </span><span class="nx">Verify</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">lock</span><span class="w"> </span><span class="nx">Lockfile</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="nx">Config</span><span class="p">,</span><span class="w"> </span><span class="nx">sourceNames</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">VerifyResult</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+<a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a><span class="p">}</span>
+<a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a>
+<a id="__codelineno-22-20" name="__codelineno-22-20" href="#__codelineno-22-20"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Pruner</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-21" name="__codelineno-22-21" href="#__codelineno-22-21"></a><span class="w">    </span><span class="nx">Prune</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">lock</span><span class="w"> </span><span class="nx">Lockfile</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="nx">Config</span><span class="p">,</span><span class="w"> </span><span class="nx">opts</span><span class="w"> </span><span class="nx">PruneOptions</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">PruneResult</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+<a id="__codelineno-22-22" name="__codelineno-22-22" href="#__codelineno-22-22"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="102-result-types">10.2 Result Types<a class="headerlink" href="#102-result-types" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">SyncResult</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">    </span><span class="nx">Written</span><span class="w">  </span><span class="p">[]</span><span class="nx">FileAction</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">    </span><span class="nx">Skipped</span><span class="w">  </span><span class="p">[]</span><span class="nx">FileAction</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">    </span><span class="nx">Errors</span><span class="w">   </span><span class="p">[]</span><span class="nx">SourceError</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="p">}</span>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="kd">type</span><span class="w"> </span><span class="nx">CheckResult</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="w">    </span><span class="nx">Clean</span><span class="w">   </span><span class="kt">bool</span>
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="w">    </span><span class="nx">Drifted</span><span class="w"> </span><span class="p">[]</span><span class="nx">DriftEntry</span>
+<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="w">    </span><span class="nx">Missing</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span>
+<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="p">}</span>
+<a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a>
+<a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a><span class="kd">type</span><span class="w"> </span><span class="nx">VerifyResult</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-23-14" name="__codelineno-23-14" href="#__codelineno-23-14"></a><span class="w">    </span><span class="nx">UpToDate</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span>
+<a id="__codelineno-23-15" name="__codelineno-23-15" href="#__codelineno-23-15"></a><span class="w">    </span><span class="nx">Changed</span><span class="w">  </span><span class="p">[]</span><span class="nx">SourceDelta</span>
+<a id="__codelineno-23-16" name="__codelineno-23-16" href="#__codelineno-23-16"></a><span class="w">    </span><span class="nx">Errors</span><span class="w">   </span><span class="p">[]</span><span class="nx">SourceError</span>
+<a id="__codelineno-23-17" name="__codelineno-23-17" href="#__codelineno-23-17"></a><span class="p">}</span>
+<a id="__codelineno-23-18" name="__codelineno-23-18" href="#__codelineno-23-18"></a>
+<a id="__codelineno-23-19" name="__codelineno-23-19" href="#__codelineno-23-19"></a><span class="kd">type</span><span class="w"> </span><span class="nx">SyncOptions</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-23-20" name="__codelineno-23-20" href="#__codelineno-23-20"></a><span class="w">    </span><span class="nx">DryRun</span><span class="w"> </span><span class="kt">bool</span>
+<a id="__codelineno-23-21" name="__codelineno-23-21" href="#__codelineno-23-21"></a><span class="p">}</span>
+<a id="__codelineno-23-22" name="__codelineno-23-22" href="#__codelineno-23-22"></a>
+<a id="__codelineno-23-23" name="__codelineno-23-23" href="#__codelineno-23-23"></a><span class="kd">type</span><span class="w"> </span><span class="nx">PruneOptions</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-23-24" name="__codelineno-23-24" href="#__codelineno-23-24"></a><span class="w">    </span><span class="nx">DryRun</span><span class="w"> </span><span class="kt">bool</span>
+<a id="__codelineno-23-25" name="__codelineno-23-25" href="#__codelineno-23-25"></a><span class="p">}</span>
+<a id="__codelineno-23-26" name="__codelineno-23-26" href="#__codelineno-23-26"></a>
+<a id="__codelineno-23-27" name="__codelineno-23-27" href="#__codelineno-23-27"></a><span class="kd">type</span><span class="w"> </span><span class="nx">PruneResult</span><span class="w"> </span><span class="kd">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-23-28" name="__codelineno-23-28" href="#__codelineno-23-28"></a><span class="w">    </span><span class="nx">Removed</span><span class="w"> </span><span class="p">[]</span><span class="nx">FileAction</span>
+<a id="__codelineno-23-29" name="__codelineno-23-29" href="#__codelineno-23-29"></a><span class="w">    </span><span class="nx">Errors</span><span class="w">  </span><span class="p">[]</span><span class="nx">SourceError</span>
+<a id="__codelineno-23-30" name="__codelineno-23-30" href="#__codelineno-23-30"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="103-library-rules">10.3 Library Rules<a class="headerlink" href="#103-library-rules" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Library MUST NOT depend on the CLI.</li>
+<li>Library MUST accept <code>context.Context</code> for cancellation and timeout.</li>
+<li>Library MUST return structured errors, not exit codes.</li>
+<li>All I/O MUST go through interfaces (filesystem, network) to enable testing and embedding.</li>
+</ul>
+<hr />
+<h1 id="11-determinism-guarantees">11. Determinism Guarantees<a class="headerlink" href="#11-determinism-guarantees" title="Permanent link">&para;</a></h1>
+<p>Given:</p>
+<ul>
+<li>Byte-for-byte identical configuration file</li>
+<li>Byte-for-byte identical lockfile</li>
+<li>Same local source files (verified by lockfile hashes)</li>
+<li>Same override files</li>
+</ul>
+<p>agent-sync MUST produce byte-for-byte identical output.</p>
+<p>This applies to all operations: sync, transforms, and overrides.</p>
+<p>Non-deterministic behavior is a bug.</p>
+<hr />
+<h1 id="12-deferred-features">12. Deferred Features<a class="headerlink" href="#12-deferred-features" title="Permanent link">&para;</a></h1>
+<hr />
+<h2 id="121-install-command-deferred">12.1 Install Command (Deferred)<a class="headerlink" href="#121-install-command-deferred" title="Permanent link">&para;</a></h2>
+<p>Future:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>agent-sync install org/security-agent
+</code></pre></div>
+<p>Would:</p>
+<ul>
+<li>Resolve a registry</li>
+<li>Fetch agent configuration</li>
+<li>Add source entry to config</li>
+</ul>
+<p>Registry specification is deferred.</p>
+<hr />
+<h2 id="122-registry-specification-deferred">12.2 Registry Specification (Deferred)<a class="headerlink" href="#122-registry-specification-deferred" title="Permanent link">&para;</a></h2>
+<p>agent-sync core remains registry-agnostic.</p>
+<p>Registries MUST NOT be required for core functionality.</p>
+<hr />
+<h1 id="13-error-handling">13. Error Handling<a class="headerlink" href="#13-error-handling" title="Permanent link">&para;</a></h1>
+<p>agent-sync MUST fail on:</p>
+<ul>
+<li>Hash mismatch (source, lockfile, or transform output)</li>
+<li>Sandbox violation</li>
+<li>Source integrity failure</li>
+<li>Ambiguous file writes (multiple sources, no override)</li>
+<li>Unknown tool name (no built-in or custom definition)</li>
+<li>Lockfile corruption or schema mismatch</li>
+</ul>
+<p>agent-sync MUST NOT silently continue past errors.</p>
+<p>All errors MUST include:</p>
+<ul>
+<li>The source or file that caused the failure</li>
+<li>The specific validation that failed</li>
+<li>A suggested remediation where possible</li>
+</ul>
+<hr />
+<h1 id="14-versioning">14. Versioning<a class="headerlink" href="#14-versioning" title="Permanent link">&para;</a></h1>
+<h2 id="141-spec-version">14.1 Spec Version<a class="headerlink" href="#141-spec-version" title="Permanent link">&para;</a></h2>
+<p>The specification version is declared in both config and lockfile:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</code></pre></div>
+<h2 id="142-version-semantics">14.2 Version Semantics<a class="headerlink" href="#142-version-semantics" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The <code>version</code> field is an integer.</li>
+<li>Each version defines a strict schema. Config and lockfile files MUST validate against the schema for their declared version.</li>
+<li>agent-sync MUST reject files with an unrecognized version.</li>
+</ul>
+<h2 id="143-compatibility-rules">14.3 Compatibility Rules<a class="headerlink" href="#143-compatibility-rules" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Patch changes</strong> (new optional fields, clarifications): no version bump. Implementations MUST ignore unknown fields gracefully.</li>
+<li><strong>Breaking changes</strong> (removed fields, changed semantics, new required fields): MUST increment the version integer.</li>
+<li>When a breaking version change occurs, agent-sync MUST provide a migration path — either an automatic <code>migrate</code> command or clear documentation of manual steps.</li>
+<li>agent-sync SHOULD support reading the immediately prior version and auto-migrating.</li>
+</ul>
+<hr />
+<h1 id="15-summary">15. Summary<a class="headerlink" href="#15-summary" title="Permanent link">&para;</a></h1>
+<p>agent-sync provides:</p>
+<ul>
+<li>Deterministic file sync from git, URL, and local sources</li>
+<li>Secure sandboxed writes with symlink and TOCTOU protection</li>
+<li>Immutable lockfile with per-file content hashes</li>
+<li>Tool map for automatic multi-tool path resolution</li>
+<li>Partial failure resilience with rollback and granular reporting</li>
+<li>Registry-agnostic core with deferred install/registry</li>
+<li>Embeddable Go library with clean interfaces</li>
+<li>CLI with sync, update, check, verify, status, info, and prune commands</li>
+</ul>
+<p>agent-sync is a synchronization engine, not an agent platform.</p>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
