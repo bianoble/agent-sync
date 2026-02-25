@@ -113,3 +113,82 @@ targets:
 ```
 
 URL sources require a `checksum` field for integrity verification.
+
+## Hierarchical Configuration
+
+agent-sync supports three config levels that merge together: system, user, and project. This lets you define global skill sets once and add project-specific sources where needed.
+
+### User Config (applies to all projects)
+
+Place at `~/Library/Application Support/agent-sync/agent-sync.yaml` (macOS) or `~/.config/agent-sync/agent-sync.yaml` (Linux):
+
+```yaml
+version: 1
+
+sources:
+  # Official Anthropic skills (mcp-builder, pdf, skill-creator, etc.)
+  - name: anthropic-skills
+    type: git
+    repo: https://github.com/anthropics/skills.git
+    ref: main
+    paths:
+      - skills/
+
+  # Community skills
+  - name: composio-skills
+    type: git
+    repo: https://github.com/ComposioHQ/awesome-claude-skills.git
+    ref: master
+
+targets:
+  - source: anthropic-skills
+    tools: [claude-code]
+
+  - source: composio-skills
+    tools: [claude-code]
+```
+
+### Project Config (project-specific additions)
+
+In a specific project, add only the sources relevant to that codebase. The global skills are inherited automatically:
+
+```yaml
+version: 1
+
+sources:
+  # Security-focused PR/diff review
+  - name: tob-differential-review
+    type: git
+    repo: https://github.com/trailofbits/skills.git
+    ref: main
+    paths:
+      - plugins/differential-review/
+
+  # Property-based testing guidance
+  - name: tob-property-testing
+    type: git
+    repo: https://github.com/trailofbits/skills.git
+    ref: main
+    paths:
+      - plugins/property-based-testing/
+
+targets:
+  - source: tob-differential-review
+    tools: [claude-code]
+
+  - source: tob-property-testing
+    tools: [claude-code]
+```
+
+Running `agent-sync info` shows the full config chain:
+
+```
+$ agent-sync info
+agent-sync dev
+  config chain:
+    system:    /etc/agent-sync/agent-sync.yaml (not found)
+    user:      ~/Library/Application Support/agent-sync/agent-sync.yaml (loaded)
+    project:   agent-sync.yaml (loaded)
+```
+
+The merged result includes all sources from both levels. See the [Enterprise Configuration](../guides/enterprise-config.md) guide for advanced patterns.

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -64,7 +65,7 @@ func loadConfigHierarchical() (*config.HierarchicalResult, error) {
 // loadLockfile reads the lockfile if it exists. Returns an empty lockfile if missing.
 func loadLockfile() (*lock.Lockfile, error) {
 	lf, err := lock.Load(lockfilePath)
-	if os.IsNotExist(err) {
+	if errors.Is(err, os.ErrNotExist) {
 		return &lock.Lockfile{Version: 1}, nil
 	}
 	if err != nil {

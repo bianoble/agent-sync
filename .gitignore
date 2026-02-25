@@ -32,5 +32,9 @@ vendor/
 .DS_Store
 Thumbs.db
 
+# agent-sync (synced output — regenerated from lockfile)
+.claude/
+agent-sync.lock
+
 # Build
 *.log

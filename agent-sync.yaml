@@ -1,0 +1,39 @@
+# Project-level agent-sync config for agent-sync itself
+# Inherits global skills from user-level config (~/.config or ~/Library/Application Support)
+# and adds project-specific skills for Go CLI development.
+version: 1
+
+sources:
+  # Security-focused PR/diff review from Trail of Bits
+  - name: tob-differential-review
+    type: git
+    repo: https://github.com/trailofbits/skills.git
+    ref: main
+    paths:
+      - plugins/differential-review/
+
+  # Property-based testing guidance (strong for Go libraries)
+  - name: tob-property-testing
+    type: git
+    repo: https://github.com/trailofbits/skills.git
+    ref: main
+    paths:
+      - plugins/property-based-testing/
+
+  # Test coverage analysis (we enforce coverage thresholds in CI)
+  - name: tob-coverage-analysis
+    type: git
+    repo: https://github.com/trailofbits/skills.git
+    ref: main
+    paths:
+      - plugins/testing-handbook-skills/skills/coverage-analysis/
+
+targets:
+  - source: tob-differential-review
+    tools: [claude-code]
+
+  - source: tob-property-testing
+    tools: [claude-code]
+
+  - source: tob-coverage-analysis
+    tools: [claude-code]
