@@ -24,6 +24,12 @@ main() {
         VERSION="$(get_latest_version)"
     fi
 
+    # Validate VERSION looks like a version tag.
+    case "$VERSION" in
+        v[0-9]*) ;; # valid
+        *) err "Invalid VERSION format: '$VERSION' (expected v<semver>, e.g. v0.1.0)" ;;
+    esac
+
     # Strip leading v for display.
     version_display="${VERSION#v}"
     printf "Installing %s v%s (%s/%s)\n" "$BINARY" "$version_display" "$os" "$arch"
@@ -89,7 +95,7 @@ detect_arch() {
 
 get_latest_version() {
     url="https://api.github.com/repos/${REPO}/releases/latest"
-    version="$(curl -sSL "$url" | grep '"tag_name"' | head -1 | sed 's/.*"tag_name": *"\([^"]*\)".*/\1/')"
+    version="$(curl -fsSL "$url" | grep '"tag_name"' | head -1 | sed 's/.*"tag_name": *"\([^"]*\)".*/\1/')"
     if [ -z "$version" ]; then
         err "Could not determine latest version from GitHub API"
     fi
@@ -107,7 +113,7 @@ download() {
 verify_checksum() {
     dir="$1"
     file="$2"
-    expected="$(grep "$file" "${dir}/checksums.txt" | awk '{print $1}')"
+    expected="$(grep -F "$file" "${dir}/checksums.txt" | awk '{print $1}')"
     if [ -z "$expected" ]; then
         err "Checksum not found for $file in checksums.txt"
     fi
@@ -117,8 +123,7 @@ verify_checksum() {
     elif command -v shasum >/dev/null 2>&1; then
         actual="$(shasum -a 256 "${dir}/${file}" | awk '{print $1}')"
     else
-        printf "Warning: no sha256sum or shasum found, skipping checksum verification\n"
-        return
+        err "Cannot verify checksum: neither sha256sum nor shasum found. Install one and retry."
     fi
 
     if [ "$actual" != "$expected" ]; then

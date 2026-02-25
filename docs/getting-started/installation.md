@@ -11,7 +11,7 @@ This auto-detects your OS and architecture, downloads the latest release, verifi
 To install a specific version:
 
 ```bash
-VERSION=v0.1.0 curl -sSL https://raw.githubusercontent.com/bianoble/agent-sync/main/install.sh | sh
+curl -sSL https://raw.githubusercontent.com/bianoble/agent-sync/main/install.sh | VERSION=v0.1.0 sh
 ```
 
 ## Quick Install (Windows)

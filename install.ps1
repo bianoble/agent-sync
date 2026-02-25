@@ -77,7 +77,7 @@ function Get-Arch {
     $arch = $env:PROCESSOR_ARCHITECTURE
     switch ($arch) {
         "AMD64" { return "amd64" }
-        "x86"   { return "amd64" } # 32-bit OS on 64-bit hardware
+        "x86"   { throw "32-bit Windows is not supported. A 64-bit system is required." }
         default { throw "Unsupported architecture: $arch" }
     }
 }
@@ -102,7 +102,7 @@ function Download-File($url, $dest) {
 function Verify-Checksum($dir, $file) {
     $checksumsFile = Join-Path $dir "checksums.txt"
     $checksums = Get-Content $checksumsFile
-    $entry = $checksums | Where-Object { $_ -match $file }
+    $entry = $checksums | Where-Object { $_.Contains($file) }
 
     if (-not $entry) {
         throw "Checksum not found for $file in checksums.txt"
