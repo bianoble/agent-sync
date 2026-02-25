@@ -14,6 +14,26 @@ These flags are available on all commands:
 
 ## Commands
 
+### init
+
+Create a starter `agent-sync.yaml` configuration file.
+
+```bash
+agent-sync init [--force]
+```
+
+- Writes a well-commented template with a git source example and documented alternatives
+- Respects the `--config` global flag for output path
+- Refuses to overwrite an existing file unless `--force` is given
+
+**Flags:**
+
+| Flag | Description |
+|------|-------------|
+| `--force` | Overwrite existing config file |
+
+---
+
 ### sync
 
 Synchronize files to targets using the lockfile.

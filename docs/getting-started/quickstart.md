@@ -2,9 +2,13 @@
 
 This guide walks through setting up agent-sync in a project.
 
-## 1. Create Configuration
+## 1. Initialize Configuration
 
-Create `agent-sync.yaml` in your project root:
+```bash
+agent-sync init
+```
+
+This creates an `agent-sync.yaml` with a commented starter template. Open it and edit the source to point at your repository:
 
 ```yaml
 version: 1
