@@ -52,6 +52,13 @@ agent-sync check
 
 This exits 0 if all target files match the lockfile, or non-zero if any files have drifted. Use this to enforce that synced files haven't been manually edited.
 
+!!! tip "CI Tip"
+    Use `--no-inherit` in CI environments to ignore system/user configs and ensure reproducible builds:
+    ```bash
+    agent-sync sync --no-inherit
+    agent-sync check --no-inherit
+    ```
+
 ## Common Workflows
 
 ### Update a Single Source

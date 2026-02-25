@@ -12,6 +12,7 @@ agent-sync fetches files from external sources (Git repositories, URLs, local pa
 - **Lockfile pinning**: Immutable content hashes ensure reproducibility
 - **Transforms**: Template variable substitution and file overrides
 - **Security**: Sandbox enforcement, atomic writes, symlink traversal prevention
+- **Hierarchical config**: System, user, and project configs merge automatically for org-wide policies
 - **CI-friendly**: `check` and `verify` commands with structured exit codes
 
 ## Quick Example
@@ -48,3 +49,5 @@ agent-sync check
 - [Quick Start](getting-started/quickstart.md) — Set up your first project
 - [Configuration Reference](reference/config.md) — Full config file documentation
 - [CLI Reference](reference/cli.md) — All available commands
+- [Go Library](reference/library.md) — Use agent-sync as a Go library
+- [Enterprise & DevSecOps](guides/enterprise-config.md) — Hierarchical config, compliance, and deployment at scale

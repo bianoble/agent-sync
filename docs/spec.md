@@ -1,5 +1,7 @@
 # agent-sync Specification v0.4
 
+> This is the authoritative specification. The file `agent-sync-spec-v0.4.md` was a historical duplicate and has been removed.
+
 **Status:** Draft
 **Audience:** Library implementers, CLI authors, and platform integrators
 **Scope:** Deterministic synchronization of agent-related files from external sources into a project workspace.
@@ -225,6 +227,48 @@ tool_definitions:
 3. If a tool name has no built-in or custom definition, agent-sync MUST error with a clear message indicating the unknown tool and how to define it.
 4. If a target specifies `destination:` directly, no tool map resolution occurs — the path is used as-is.
 5. `tools:` and `destination:` are mutually exclusive on a single target entry.
+
+---
+
+## 3.3 Hierarchical Configuration
+
+agent-sync supports three-level hierarchical configuration: **system**, **user**, and **project**. Configs are discovered automatically and merged in order of increasing precedence.
+
+### Discovery Paths
+
+| Level | macOS | Linux | Windows |
+|-------|-------|-------|---------|
+| System | `/etc/agent-sync/agent-sync.yaml` | `/etc/agent-sync/agent-sync.yaml` | `%ProgramData%\agent-sync\agent-sync.yaml` |
+| User | `~/Library/Application Support/agent-sync/agent-sync.yaml` | `$XDG_CONFIG_HOME/agent-sync/agent-sync.yaml` | `%AppData%\agent-sync\agent-sync.yaml` |
+| Project | `./agent-sync.yaml` | `./agent-sync.yaml` | `.\agent-sync.yaml` |
+
+Missing config files at any level are silently skipped.
+
+### Merge Semantics
+
+When multiple config levels are present, they are merged as follows:
+
+| Field | Strategy |
+|-------|----------|
+| `version` | MUST agree across all layers. Mismatch is a fatal error. |
+| `variables` | Deep merge. Higher-precedence keys overwrite lower. Unique keys are preserved. |
+| `sources` | Merge by `name`. A source in a higher-precedence layer fully replaces a source with the same name from a lower layer. |
+| `tool_definitions` | Merge by `name`. Same replacement semantics as sources. |
+| `targets` | Concatenate. System targets first, then user, then project. |
+| `overrides` | Concatenate. Applied in order: system, user, project. |
+| `transforms` | Concatenate. Applied in order: system, user, project. |
+
+### Disabling Hierarchical Resolution
+
+The `--no-inherit` CLI flag or `AGENT_SYNC_NO_INHERIT=1` environment variable disables hierarchical resolution. When set, only the project-level config is used. This is RECOMMENDED for CI/CD environments to ensure reproducible builds.
+
+### Environment Variable Overrides
+
+| Variable | Purpose |
+|----------|---------|
+| `AGENT_SYNC_SYSTEM_CONFIG` | Override the system config file path |
+| `AGENT_SYNC_USER_CONFIG` | Override the user config file path |
+| `AGENT_SYNC_NO_INHERIT` | Set to `1` or `true` to disable hierarchical resolution |
 
 ---
 
@@ -786,6 +830,17 @@ The following flags are available on all commands:
 * `--verbose` — detailed output
 * `--quiet` — minimal output (errors only)
 * `--no-color` — disable colored output
+* `--no-inherit` — disable hierarchical config resolution (use only the project config)
+
+---
+
+## 9.9 Environment Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `AGENT_SYNC_SYSTEM_CONFIG` | Override the system config file path |
+| `AGENT_SYNC_USER_CONFIG` | Override the user config file path |
+| `AGENT_SYNC_NO_INHERIT` | Set to `1` or `true` to disable hierarchical resolution |
 
 ---
 

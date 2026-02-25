@@ -11,6 +11,7 @@ These flags are available on all commands:
 | `--verbose` | `false` | Detailed output |
 | `--quiet` | `false` | Minimal output (errors only) |
 | `--no-color` | `false` | Disable colored output |
+| `--no-inherit` | `false` | Disable hierarchical config resolution (use only the project config) |
 
 ## Commands
 
@@ -179,3 +180,11 @@ agent-sync version
 |------|---------|
 | 0 | Success |
 | 1 | Error or drift detected |
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `AGENT_SYNC_SYSTEM_CONFIG` | Override the system config file path |
+| `AGENT_SYNC_USER_CONFIG` | Override the user config file path |
+| `AGENT_SYNC_NO_INHERIT` | Set to `1` or `true` to disable hierarchical config resolution |
